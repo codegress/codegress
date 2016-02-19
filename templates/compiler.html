@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">  
+    <title>Compiler</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+  </head>
+  <body>
+    <div class="container" style="width:90%;">
+      <div class="page-header"></div>
+        <div class="inner-container hide">
+          <div class="select-wrapper form-group">
+              <select id="select-lang" name="" class="form-control">
+                  <option value="none" selected disabled>Language</option>
+                  <option value="Python">Python</option>
+                  <option value="Java">Java</option>
+              </select>
+          </div>
+          <div class="editor-wrapper form-group">
+            <textarea id="editor" class="form-control" autofocus></textarea>
+          </div>
+          <div>
+              <input type="checkbox" id="custom-input">
+              <label for="custom-input">Custom Inputs</label>
+          </div>
+          <div class="custom-input hide">
+            <label for="input">Input</label>
+            <div class="form-group">
+              <textarea id="input" class="form-control" rows="5"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" id="compile-btn" class="btn btn-primary btn-sm" disabled>Compile &amp; Run</button>
+            <img id="loading" src="../static/images/codegress/loading.gif" alt="" style="display:none;" />
+          </div>
+          <div class="ack panel panel-default hide ">
+            <div class="panel-heading"><b class="ack-header"></b></div>
+            <div class="panel-body ack-body"></div>
+            <div class="ack-footer"></div>
+          </div>
+          <!-- <div class="ack hide"> -->
+            <!-- <div class="ack-header"></div> -->
+            <!-- <div class="ack-body"></div> -->
+            <!-- <div class="ack-footer"></div> -->
+          <!-- </div> -->
+        </div>
+    </div>
+    <script>const $ = jQuery = require('../static/js/libs/jquery');</script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="../codemirror/lib/codemirror.js"></script>
+    <script src="../codemirror/mode/python/python.js"></script>
+    <script src="../codemirror/mode/clike/clike.js"></script>
+    <script src="../codemirror/addon/edit/closebrackets.js"></script>
+    <script src="../codemirror/addon/comment/comment.js"></script>
+    <script src="../static/js/codegress_compiler.js"></script>
+    <script>
+      function init(){
+        actualInit('https://code-gress-endpoint.appspot.com/_ah/api');
+      };
+    </script>
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
+  </body>
+</html>

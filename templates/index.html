@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+  <title>Codegress</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+  <div class="container" style="width:100%;">
+    <div class="page-header">
+        <a href="" class="logo">
+          <img id="codegress-logo" src="../static/images/codegress/codegress-logo.gif" alt="codegress logo">
+        </a>
+    </div>
+
+    <!-- Sign in form -->
+    <div class="signin hide">
+      <form action="" method="post" role="form" class="box" id="signin-form">
+        <p class="box-title text-danger text-center text-uppercase">Sign in</p><hr>
+        <div class="form-group" id="email-group">
+          <input type="text" id="email" name="email" class="form-control" placeholder="Email" autofocus>
+        </div>
+        <div class="form-group" id="password-group">
+          <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+        </div>
+        <p>
+          <button type="submit" class="btn btn-success btn-sm form-control" id="signin-btn">Sign In</button>
+        </p>
+        <!-- <p id="forgot" class="hide"><a href="#" class="pull-right">Forgot password?</a></p> -->
+        <p id="status" class="text-danger"></p>
+      </form>
+    </div>
+
+    <!-- SignUp form -->
+    <div class="signup hide">
+      <form action="" method="post" role="form" id="signup-form" class="box">
+        <p class="box-title text-danger text-center text-uppercase">Sign up</p><hr>
+        <div class="form-group has-feedback " id="username-group">
+          <input type="text" id="username" name="username" value="" class="form-control" placeholder="Username">
+        </div>
+        <div class="form-group has-feedback " id="email-group">
+          <input type="text" id="email" name="email"  value=""
+          class="form-control" placeholder="Email">
+        </div>
+        <div class="form-group has-feedback" id="password-group">
+          <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+        </div>
+        <p>
+          <button type="submit" id="signup-btn" class="btn btn-success btn-sm form-control">Sign Up</button>
+        </p>
+        <p><a id="signin" href="">Already registered?</a></p>
+        <p id="status" class="text-danger"></p>
+      </form>
+  </div>
+
+   <!-- Recover form -->
+    <div class="recover hide">
+      <form action="" method="post" role="form" class="box" id="recover-form">
+        <p class="box-title text-danger text-center text-uppercase">Email Password</p><hr>
+          <div class="form-group">
+          <input type="text" id="email-forgot" name="email" value="" class="form-control" placeholder="Registered Email">
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-success form-control" id="recover-btn">Recover</button>
+        </div>
+      </form>
+    </div>
+  </div>
+	<script src="../static/js/index.js"></script>
+  <script>
+      function init(){
+        actualInit('https://code-gress-endpoint.appspot.com/_ah/api');
+      };
+  </script>
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</body>
+</html>

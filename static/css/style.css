@@ -1,0 +1,192 @@
+body{
+	font-family: "Lucida Grande";
+	font-size: 13px;
+	min-width: 1000px;
+}
+.container{
+	
+}
+.dropdown{
+	cursor: pointer;
+}
+.dropdown-menu{
+	font-family: "Lucida Grande";
+	font-size: 14px;
+	text-align: center;
+}
+hr{
+	border-color: silver;
+	margin-top: 0px;
+	padding: 0px;
+}
+.header{
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 15px 0px 0px 15px;
+	/*background-color:#e9eaed;*/
+	border-radius: 10px;	
+}
+.header .container{
+	
+}
+.box{
+	margin:auto;
+	box-shadow: 0.2px 0.5px 1.1px gray;
+	border-radius: 5px;
+	padding: 20px;	
+	background-color: white;
+	width: 27%;
+}
+.box-title{
+	padding-top:20px;
+	font-size: 16px;
+}
+.form-control:focus{
+	box-shadow: none;
+}
+.validation-error{
+	background: #FEF1EC;
+    border: 1px solid #CD0A0A;
+}
+#handle-error{
+	font-size: 13px;
+}
+.feeds{
+	padding:5px;
+	box-shadow:0px 0px 1px gray;
+}
+.feed{
+	padding: 10px;
+	margin-bottom: 15px;
+	background-color: white;
+}
+.feed-head{
+	color: #666;
+	font-family: "Droid Sans";
+	font-weight: bold;
+}
+.feed-title .title{
+	padding: 0px 0px 0px 5px;
+	font-family: "Droid Sans";
+	font-weight: bold;
+	color: #666;
+}
+.feed-body{
+	padding: 0px 0px 5px 5px;
+	color: gray;
+	cursor: pointer;
+}
+
+.feed-body:hover{
+}
+.challenges{
+	margin-top: 10px;
+	padding: 10px;
+	box-shadow:0px 0px 1px gray;
+}
+.challenge{
+	padding: 10px;
+	margin-bottom: 5px;
+	background-color: #eee;
+	box-shadow:0px 0px 1px gray;
+}
+.challenge-title{
+	color: #666;
+	font-family: "Droid Sans";
+	margin-bottom: 0px;
+}
+.challenge-title .title{
+	padding: 0px 0px 0px 5px;
+}
+.challenge-title .date{
+	font-size: 12px;
+}
+#new-challenge{
+	margin:auto;	
+}
+#new-challenge .form-group{
+	width: 65%;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom: 15px;
+}
+#new-challenge .form-group #note{
+	color: gray;
+}
+#new-challenge .form-group > span{
+	
+}
+#testcase-list li{
+	margin-left: 5px;
+}
+.graphs{
+	display: none;
+	color: #999;
+	color: gray;
+	padding: 0px;
+}
+.graph{
+
+}
+.graph-title{
+	font-weight: bold;
+	color: #666;
+	font-family: "Droid Sans";
+	text-align: center;
+}
+.graph-body{
+	padding: 10px;
+}
+.logo{
+	width: 55px;
+}
+#handle-img{
+	width: 35px;
+}
+.challenger-image:hover{
+	text-decoration: none;
+}
+.challenger-image img{
+	width: 28px;
+}
+.pointer{
+	cursor: pointer;
+}
+#codegress-logo{
+	width:38px;
+}
+.forgot-text{
+	position: relative;
+	left: 10px;
+}
+.btn-login{
+	position: relative;
+	left: 140px;
+}
+.editor-wrapper{
+	width: 60%;
+}
+.select-wrapper{
+	width: 20%;
+}
+.custom-input{
+	margin-top: 10px;
+	width: 60%;
+}
+#compile-btn{
+	margin-top:10px; 
+}
+#loading{
+	width:25px;
+	margin-top:10px;
+}
+.ack{
+	margin-bottom: 20px;
+	width: 60%;
+}
+.ack-header{
+	/*font-weight: bold;*/
+}
+.ack-body{
+
+}
