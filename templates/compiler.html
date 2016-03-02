@@ -10,11 +10,14 @@
   </head>
   <body>
     <div class="container" style="width:90%;">
-      <div class="page-header"></div>
+      <div class="page-header">
+        <h4 id="q-title"></h4>
+        <h5 id="q-text"></h5>
+      </div>
         <div class="inner-container hide">
           <div class="select-wrapper form-group">
               <select id="select-lang" name="" class="form-control">
-                  <option value="none" selected disabled>Language</option>
+                  <option value="none" selected disabled>Select Language</option>
                   <option value="Python">Python</option>
                   <option value="Java">Java</option>
               </select>
@@ -22,7 +25,7 @@
           <div class="editor-wrapper form-group">
             <textarea id="editor" class="form-control" autofocus></textarea>
           </div>
-          <div>
+          <div class="">
               <input type="checkbox" id="custom-input">
               <label for="custom-input">Custom Inputs</label>
           </div>
@@ -36,16 +39,8 @@
             <button type="submit" id="compile-btn" class="btn btn-primary btn-sm" disabled>Compile &amp; Run</button>
             <img id="loading" src="../static/images/codegress/loading.gif" alt="" style="display:none;" />
           </div>
-          <div class="ack panel panel-default hide ">
-            <div class="panel-heading"><b class="ack-header"></b></div>
-            <div class="panel-body ack-body"></div>
-            <div class="ack-footer"></div>
-          </div>
-          <!-- <div class="ack hide"> -->
-            <!-- <div class="ack-header"></div> -->
-            <!-- <div class="ack-body"></div> -->
-            <!-- <div class="ack-footer"></div> -->
-          <!-- </div> -->
+          <ol class="ack hide"></ol>
+          <div class="ack-footer"></div>
         </div>
     </div>
     <script>const $ = jQuery = require('../static/js/libs/jquery');</script>
@@ -55,7 +50,7 @@
     <script src="../codemirror/mode/clike/clike.js"></script>
     <script src="../codemirror/addon/edit/closebrackets.js"></script>
     <script src="../codemirror/addon/comment/comment.js"></script>
-    <script src="../static/js/codegress_compiler.js"></script>
+    <script src="../static/js/compiler.js"></script>
     <script>
       function init(){
         actualInit('https://code-gress-endpoint.appspot.com/_ah/api');

@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Custom Codegress</title>
+	<title>Custom Codegress</title> 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   	<link rel="stylesheet" href="../static/css/style.css">
 </head>
-<body style="padding-top: 70px;" style="min-width: 100%"> 
+<body style="padding-top: 70px;" style="min-width: 100%" class="hide"> 
 	<nav class="navbar navbar-default navbar-fixed-top">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
@@ -29,27 +29,18 @@
 	<div class="container-fluid">
 	    <div class="row">
 	    	<div class="col-xs-2">
-	    		<ul class="nav nav-sidebar">
-	    			<li><a href="#">Challenges&nbsp;&nbsp;<span class="badge">4</span></a></li>
-	    			<li><a href="#">Messages&nbsp;&nbsp;<span class="badge">1</span></a></li>
-	    			<li><a href="#">Submissions&nbsp;&nbsp;<span class="badge">50</span></a></li>
+	    		<ul class="nav nav-sidebar text-center">
+	    			<h4>Domains</h4>
+	    			<li><a href="strings" class="domain">Strings</a></li>
+	    			<li><a href="stacks" class="domain">Stacks</a></li>
+	    			<li><a href="queues" class="domain">Queues</a></li>
+	    			<li><a href="trees" class="domain">Trees</a></li>
 	    		</ul>
 	    	</div>
 	    	<div class="col-xs-8">
-	    		<div class="feed">
-	    			<div class="panel panel-default">
-	    				<div class="panel-heading">
-	    					<span class="text-primary text-center">Lorem ipsum dolor sit amet</span>
-	    				</div>
-	    				<div class="panel-body">
-		    				Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident minus recusandae, cupiditate voluptatibus perferendis magnam sit laborum sint, numquam vel ipsam cum ad quo et inventore cumque. Ea, adipisci, omnis!
-		    			</div>
-		    			<div class="panel-footer">
-		    				<a class="text-danger" href="">Solve</a>
-		    				<a class="text-danger" href="">Challenge</a>
-		    				<a class="text-danger" href="">Comment</a>
-		    			</div>
-	    			</div>
+	    		<div id="selected-domain"></div>
+	    		<div class="feed-panel">
+	    			<ol class="feed"></ol>
 	    		</div>
 	    	</div>
 	    	<div class="col-xs-2">
@@ -57,6 +48,12 @@
 	    	</div>
 	    </div>
 	</div>
+	<script>
+      function init(){
+        actualInit('https://code-gress-endpoint.appspot.com/_ah/api');
+      };
+    </script>
+  	<script src="https://apis.google.com/js/client.js?onload=init"></script>
 	<script>const $ = jQuery = require('../static/js/libs/jquery');</script>
 	<script src="../static/js/codegress.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

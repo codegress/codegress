@@ -35,7 +35,7 @@ hr{
 	border-radius: 5px;
 	padding: 20px;	
 	background-color: white;
-	width: 27%;
+	width: 25%;
 }
 .box-title{
 	padding-top:20px;
@@ -51,12 +51,14 @@ hr{
 #handle-error{
 	font-size: 13px;
 }
+#domain{
+	padding: 5px;
+}
 .feeds{
-	padding:5px;
 	box-shadow:0px 0px 1px gray;
 }
 .feed{
-	padding: 10px;
+	padding: 5px;
 	margin-bottom: 15px;
 	background-color: white;
 }
@@ -84,12 +86,12 @@ hr{
 	padding: 10px;
 	box-shadow:0px 0px 1px gray;
 }
-.challenge{
+/*.challenge{
 	padding: 10px;
 	margin-bottom: 5px;
 	background-color: #eee;
 	box-shadow:0px 0px 1px gray;
-}
+}*/
 .challenge-title{
 	color: #666;
 	font-family: "Droid Sans";
@@ -164,7 +166,7 @@ hr{
 	left: 140px;
 }
 .editor-wrapper{
-	width: 60%;
+	width: 70%;
 }
 .select-wrapper{
 	width: 20%;
@@ -185,7 +187,7 @@ hr{
 	width: 60%;
 }
 .ack-header{
-	/*font-weight: bold;*/
+	
 }
 .ack-body{
 
