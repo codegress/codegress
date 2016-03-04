@@ -1,1 +1,1 @@
-print raw_input()
+print "Start your code here.."

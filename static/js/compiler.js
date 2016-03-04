@@ -225,17 +225,16 @@ function loadCompiler(){
     if(hasCustomInput()){
       var inputPipe = getCustomPipe();
       genericRunner(fileName, command, inputPipe);
-      processEnd();
     }
     else if(inputPipes.length > 0){
       for(var index = 0; index < inputPipes.length;index++){
           var currentInputPipe = inputPipes[index];
           var actualOutput = outputData[index];
-          genericRunner(fileName,command,currentInputPipe,actualOutput);
+          genericRunner(fileName, command, currentInputPipe, actualOutput);
       }
-      processEnd();
     }
     else genericRunner(fileName, command,'pipe');
+    processEnd();
   }
 
   /* Starting compilation process based on selected language */
@@ -345,9 +344,9 @@ function loadCompiler(){
         compile(fileName);
       }
       else if(!languageData)
-        alert('No language selected');
+        alert('Selected language is unavailable..');
       else
-        alert('No Testcase data available') ;
+        alert('Unable to fetch testcases..') ;
   });
 
   /* Disable/Enable custom inputs */

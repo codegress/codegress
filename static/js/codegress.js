@@ -4,14 +4,14 @@ function actualInit(apiRoot){
 	var apisToLoad;
     var callback = function(){
         if(--apisToLoad == 0){
-            loadCodegressUniverse();
+            loadEverything();
         }
     };
   apisToLoad = 1;
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
 };
 
-function loadCodegressUniverse(){
+function loadEverything(){
 	$('body').removeClass('hide');
 
 	var session = remoteSession.fromPartition('persist:codegress'); 
@@ -25,28 +25,25 @@ function loadCodegressUniverse(){
 			ipcRenderer.send('swap',{url:'index.html'});
 		});
 	});
-	var domain = null;
-	$('.domain').click(function(event){
-		event.preventDefault();
-		domain = $(this).text();
-		gapi.client.codegress.question.getDomainQuestion({'domain':domain}).execute(function(resp){
-			if(!resp.code){
-				var questions = resp.ques;
-				loadQuestions(questions);	
-			}
-			else console.log(resp);
-		});
+
+	gapi.client.codegress.question.getQuestions({}).execute(function(resp){
+		if(!resp.code){
+			var questions = resp.ques;
+			loadQuestions(questions);	
+		}
+		else console.log(resp);
 	});
 
 	function clearFeed(){
 		$('.feed').html('');	
 	}
 
+	var domain = null;
 	function loadQuestions(questions){
 		clearFeed();
 		for(var index = 0; index < questions.length;index++){
 			var currentQuestion = questions[index];
-			var domain = currentQuestion.domain;
+			domain = currentQuestion.domain;
 			var title = currentQuestion.title;
 			var text = currentQuestion.text;
 			addQuestion(title, text);
