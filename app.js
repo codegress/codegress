@@ -36,12 +36,6 @@ app.on('ready',function(){
     mainWindow.on('closed',function(){
 		    mainWindow = null;
 	  });
-
-    // var ses = mainWindow.webContents.session;
-    // const proxyURL = "http=10.10.10.3:3128";
-    // ses.setProxy({proxyRules:proxyURL},function(){
-        // console.log('Proxy set to '+proxyURL);
-    // });
 });
 
 app.on('window-all-closed', function() {

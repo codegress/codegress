@@ -9,14 +9,16 @@
     <link rel="stylesheet" href="../static/css/style.css">
   </head>
   <body>
-    <div class="container" style="width:90%;">
+    <div class="container">  
       <div class="page-header">
         <a href="codegress.html" class="logo swap">
           <img id="codegress-logo" src="../static/images/codegress/codegress-logo.gif" alt="codegress logo">
         </a>
       </div>
-        <h4 id="q-title"></h4>
-        <h5 id="q-text"></h5>
+        <div class="">
+          <h4 id="q-title"></h4>
+          <h5 id="q-text"></h5>
+        </div>
         <div class="inner-container hide">
           <div class="select-wrapper form-group">
               <select id="select-lang" name="" class="form-control">
@@ -25,8 +27,14 @@
                   <option value="Java">Java</option>
               </select>
           </div>
-          <div class="editor-wrapper form-group">
-            <textarea id="editor" class="form-control" autofocus></textarea>
+          <div style="display: flex;">
+            <div class="editor-wrapper form-group">
+              <textarea id="editor" class="form-control" autofocus></textarea>
+            </div>
+            <div>
+              <ol class="ack hide"></ol>
+              <div class="ack-footer"></div>
+            </div>
           </div>
           <div class="">
               <input type="checkbox" id="custom-input">
@@ -38,12 +46,14 @@
               <textarea id="input" class="form-control" rows="5"></textarea>
             </div>
           </div>
-          <div class="form-group">
-            <button type="submit" id="compile-btn" class="btn btn-primary btn-sm" disabled>Compile &amp; Run</button>
-            <img id="loading" src="../static/images/codegress/loading.gif" alt="" style="display:none;" />
+          <div class="form-group list-inline">
+            <li>
+              <button type="submit" id="compile-btn" class="btn btn-primary btn-sm" disabled>Compile &amp; Run</button>
+            </li>
+            <li>
+              <img id="loading" src="../static/images/codegress/loading.gif" alt="" style="display:none;" />
+            </li>
           </div>
-          <ol class="ack hide"></ol>
-          <div class="ack-footer"></div>
         </div>
     </div>
     <script>const $ = jQuery = require('../static/js/libs/jquery');</script>

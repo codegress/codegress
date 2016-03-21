@@ -35,12 +35,11 @@ function loadCompiler(){
   const remoteSession = electron.remote.session;
   const fileSystem = require('fs');
   const childProcess = require('child_process').spawn;
-  var languageData = null, isCompiled = false, testCaseData = null;
+  var languageData = null, isCompiled = false, testCaseData = null, qDomain = null;
   var inputPipes = [], outputData = [], inputData = [];
-  var qDomain = null;
-
+  var testCaseResponse = {};  
   var session = remoteSession.fromPartition('persist:codegress');  
-  
+
   ipcRenderer.send('qdata',{});
   
   ipcRenderer.on('qdata',function(event,data){
@@ -66,21 +65,19 @@ function loadCompiler(){
 
   /* sets language data variable based on selected language */
   $( "#select-lang" ).change(function() {
-    
     disableCompileButton("Fetching Data...");
     var selectedLang = $( "#select-lang option:selected" ).val();
     $('.ack').addClass('hide');
-
     gapi.client.codegress.language.getLanguage({'name':selectedLang}).execute(function(response){
         if(!response.code){
-          languageData = response;
+          languageData = response.items[0];
           editor.setOption('mode',languageData.mode);
           editor.setOption('value',languageData.placeholder);
           editor.refresh();
           enableCompileButton("Compile & Run");
         }
         else console.log(response);
-    });
+      });
   });
 
   function enableCompileButton(text){
@@ -117,18 +114,21 @@ function loadCompiler(){
       $('.ack').append(listElement);   
   }
 
+  var testCasePassed = 0;
   function acknowledge(data, isError){
-    data = escapeHtml(data);
+    data = escapeHTML(data);
     var formattedData = data.replace(/\r\n|\r|\n/g,'<br>');
     if(isError && !hasCustomInput()){
         error("Error : ",formattedData);
     }
     else {
       success("Success : ",formattedData);
+      ++testCasePassed;
+      console.log(testCasePassed);
     }
   }
 
-  function escapeHtml(unsafe) {
+  function escapeHTML(unsafe) {
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")
@@ -209,12 +209,16 @@ function loadCompiler(){
       if(err){
         acknowledge(err, true);
       }
-      else if(out == actualOutput){
-        acknowledge(out, false); 
+      else if(actualOutput){
+        var outputString = 'Output : '+actualOutput+'\nYour output : '+out;
+        if(out.replace(/\n\r|\n/,'') == actualOutput){
+          acknowledge(outputString, false); 
+        }
+        else{
+          acknowledge(outputString, true); 
+        }
       }
-      else if(out){
-        acknowledge(out, true); 
-      }
+      else acknowledge(out, false);
       fileSystem.closeSync(inputPipe);
     });
   }
@@ -266,15 +270,49 @@ function loadCompiler(){
   function processStart(){
     disableCompileButton("Processing..");
     $('#loading').css({'display':''});
-    $('.ack').addClass('hide');
+    hideAcknowledge();
+    testCasePassed = 0;
   }
   
   /* handling html elements behaviour after compilation*/
   function processEnd(){
     enableCompileButton("Compile & Run");
     $('#loading').css({'display':'none'});
-    $('.ack').removeClass('hide');
+    showAcknowledge();
     scrollToBottom();
+    // submitCode();
+  }
+
+  function showAcknowledge(){
+    $('.ack').removeClass('hide');
+  }
+
+  function hideAcknowledge(){
+    $('.ack').addClass('hide');
+  }
+
+  function submitCode(){
+    var user = null;
+    console.log(testCasePassed);
+    if(testCasePassed == testCaseData.length){
+      session.cookies.get({name:'email'},function(error,cookies){
+        if(cookies.length > 0) {
+          user = cookies[0].value;
+        }
+      });
+    }
+    gapi.client.codegress.submission.addSubmission(
+      {
+        ques_title:qTitle,
+        submission_text:editor.getValue(),
+        submitted_user:user
+      }
+        ).execute(function(response){
+        if(!response.code){
+          console.log('Submission saved');
+        }
+        else console.log(response);
+      });
   }
 
   function scrollToBottom(){
@@ -297,6 +335,7 @@ function loadCompiler(){
     if(testCaseData != null){
       for(var i = 0; i < testCaseData.length;i++){
         var currentInputData = testCaseData[i].test_in;
+        testCaseResponse[currentInputData] = false;
         var inputFile = "input"+(i+1)+".txt";
         inputPipes[i] = getInputPipe(inputFile, currentInputData);
         inputData[i] = currentInputData;
@@ -334,7 +373,7 @@ function loadCompiler(){
   /* Compilation process starts here.. */
   $('#compile-btn').click(function(){
       clearAcknowledge();
-      if(languageData && testCaseData){
+      if(languageData && (testCaseData || hasCustomInput())){
         const entry = editor.getValue();
         var fileName = 'random'+languageData.ext;
         writeFile(fileName,entry);
@@ -343,10 +382,7 @@ function loadCompiler(){
         }
         compile(fileName);
       }
-      else if(!languageData)
-        alert('Selected language is unavailable..');
-      else
-        alert('Unable to fetch testcases..') ;
+      else alert('No testcase available, use custom cases');
   });
 
   /* Disable/Enable custom inputs */

@@ -183,8 +183,10 @@ hr{
 	margin-top:10px;
 }
 .ack{
-	margin-bottom: 20px;
-	width: 60%;
+	
+}
+.ack > li{
+	margin-bottom: 10px;
 }
 .ack-header{
 	

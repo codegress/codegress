@@ -7,7 +7,7 @@
   	<link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body style="padding-top: 70px;" style="min-width: 100%" class="hide"> 
-	<nav class="navbar navbar-default navbar-fixed-top">
+	<nav class="navbar navbar-default navbar-fixed-top"> 
 	  <div class="container-fluid">
 	    <div class="navbar-header">
     		<a href="codegress.html" class="navbar-brand">
@@ -41,10 +41,25 @@
 	    			<ol class="feed"></ol>
 	    		</div>
 	    	</div>
-	    	<div class="col-xs-2">
-	    		
-	    	</div>
+	    	<div class="col-xs-2"></div>
 	    </div>
+	    <div id="challenger-modal" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title">Select a challenger</h4>
+		      </div>
+		      <div class="modal-body">
+		      	<form action="" role="form" id="challenger-select-form">
+			        <div class="form-group">
+					  <input type="search" class="form-control" id="challenger" placeholder="Search Email or Username" autofocus>
+				  	</div>
+			  	</form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
 	</div>
 	<script>
       function init(){

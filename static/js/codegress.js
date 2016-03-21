@@ -17,7 +17,7 @@ function loadEverything(){
 	var session = remoteSession.fromPartition('persist:codegress'); 
 
 	session.cookies.get({name:'email'},function(error,cookies){
-		if(cookies.length > 0) $('#header').html(cookies[0].value);
+		if(cookies.length > 0) $('#header').html(cookies[0].value); 
 	});
 
 	$('#logout').click(function(event){
@@ -26,7 +26,7 @@ function loadEverything(){
 		});
 	});
 
-	gapi.client.codegress.question.getQuestions({}).execute(function(resp){
+	gapi.client.codegress.question.getQuestion({}).execute(function(resp){
 		if(!resp.code){
 			var questions = resp.ques;
 			loadQuestions(questions);	
@@ -58,11 +58,16 @@ function loadEverything(){
 			var qData = {'qDomain':domain, 'qTitle':title, 'qText':text};
 			ipcRenderer.send('load',{url:'compiler.html',qData:qData});
 		});
+		
 		$('.challenge').click(function(){
-			console.log('CHALLENGE');
+			console.log('Select a challenger');
+			$('#challenger-modal').on('show-bs-modal',function(){
+				$('#challenger').attr('autofocus',true);
+			});
 		});
+
 		$('.comment').click(function(){
-			console.log('COMMENT');
+			$(this).siblings('.comment-section').toggleClass('hide');
 		});
 	}
 
@@ -70,11 +75,18 @@ function loadEverything(){
 		var listQuestion = "<li><h4>"+title+"</h4>";
 		listQuestion += "<h5>"+text+"</h5><ul class='list-inline'>";
 		listQuestion += "<li class='solve'><a href='#' class='btn btn-primary btn-xs'>Solve</a></li>"
-		listQuestion += "<li class='challenge'><a href='#' class='btn btn-primary btn-xs'>Challenge</a></li>"
+		listQuestion += "<li class='challenge'><a href='#' class='btn btn-primary btn-xs' data-toggle='modal' data-target='#challenger-modal'>Challenge</a></li>"
 		listQuestion += "<li class='comment'><a href='#' class='btn btn-primary btn-xs'>Comment</a></li>";
 		listQuestion += "<li class='title'><input type='hidden' value='"+title+"'></li>";
 		listQuestion += "<li class='text'><input type='hidden' value='"+text+"'></li>";
+		listQuestion += "<li class='comment-section hide'><input type='text'></li>";
 		listQuestion += "</li></ul>";
 		$('.feed').append(listQuestion);
 	}
+
+	$('#challenger-select-form').submit(function(event){
+		event.preventDefault();
+		var selectedChallenger = $('#challenger').val();
+		console.log(selectedChallenger);
+	});
 }
