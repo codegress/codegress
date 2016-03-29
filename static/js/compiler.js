@@ -43,9 +43,9 @@ function loadCompiler(){
   ipcRenderer.send('qdata',{});
   
   ipcRenderer.on('qdata',function(event,data){
-    qDomain = data.qDomain;
-    qTitle = data.qTitle;
-    qText = data.qText;
+    qDomain = data.question_domain;
+    qTitle = data.question_title;
+    qText = data.question_text;
     displayQuestion(qTitle, qText);
     getTestCaseData(qTitle);
   });

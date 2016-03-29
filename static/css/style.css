@@ -20,11 +20,10 @@ hr{
 	padding: 0px;
 }
 .header{
-	margin-top: 15px;
 	margin-bottom: 15px;
-	padding: 15px 0px 0px 15px;
-	/*background-color:#e9eaed;*/
-	border-radius: 10px;	
+	border: 1px solid silver;
+	background-color: #eee;
+	height: 70px;
 }
 .header .container{
 	
@@ -55,20 +54,12 @@ hr{
 	padding: 5px;
 }
 .feeds{
-	box-shadow:0px 0px 1px gray;
+	
 }
 .feed{
-	padding: 5px;
-	margin-bottom: 15px;
-	background-color: white;
+	
 }
-.feed-head{
-	color: #666;
-	font-family: "Droid Sans";
-	font-weight: bold;
-}
-.feed-title .title{
-	padding: 0px 0px 0px 5px;
+.feed-title{
 	font-family: "Droid Sans";
 	font-weight: bold;
 	color: #666;
@@ -80,6 +71,7 @@ hr{
 }
 
 .feed-body:hover{
+
 }
 .challenges{
 	margin-top: 10px;
@@ -122,13 +114,10 @@ hr{
 	margin-left: 5px;
 }
 .graphs{
-	display: none;
-	color: #999;
-	color: gray;
-	padding: 0px;
+	margin:auto;
 }
 .graph{
-
+	border: 1px solid silver;
 }
 .graph-title{
 	font-weight: bold;
@@ -193,4 +182,16 @@ hr{
 }
 .ack-body{
 
+}
+.profile-image{
+	width: 50%;
+}
+.profile-container{
+	text-align: center;
+	width:20%;
+}
+.profile-content{
+	margin-top: 10px;
+	border: 1px solid silver;
+	height: 300px;
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">  
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script>const $ = jQuery = require('../static/js/libs/jquery');</script>
+</head>
+<body class="hide">
+	<script src="../static/js/intersect.js"></script>
+	
+	<div class="container">
+		<div class="profile-container">
+			<img src="../static/images/codegress/default-handle-img.png" class="profile-image">
+			<div class="profile-content">
+			<ul class="list-unstyled">
+				<li class="list-group-item"
+				>email</li>
+				<li class="list-group-item">country</li>
+				<li class="list-group-item"></li>
+			</ul>
+			</div>
+		</div>
+	</div>
+
+	<script src="../static/js/profile.js"></script>
+	<script>
+      function init(){
+        actualInit('https://code-gress-endpoint.appspot.com/_ah/api');
+      };
+    </script>
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
+</body>
+</html>

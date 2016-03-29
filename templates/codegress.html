@@ -5,43 +5,33 @@
 	<title>Custom Codegress</title> 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   	<link rel="stylesheet" href="../static/css/style.css">
+  	<script>const $ = jQuery = require('../static/js/libs/jquery');</script>
 </head>
-<body style="padding-top: 70px;" style="min-width: 100%" class="hide"> 
-	<nav class="navbar navbar-default navbar-fixed-top"> 
-	  <div class="container-fluid">
-	    <div class="navbar-header">
-    		<a href="codegress.html" class="navbar-brand">
-    		<img id="codegress-logo" style="width:35px;" src="../static/images/codegress/codegress-logo.gif" 
-    		alt="codegress logo">
-    		</a>
-	    </div>
-	    <div class="dropdown navbar-right navbar-text">
-	    	<div style="margin-right:10px;" data-toggle="dropdown" class="dropdown-toggle handle-image" 
-	    		aria-haspopup="true">
-	    		<img id="handle-img" src="../static/images/codegress/default-handle-img.png">
-	    		<span class="caret"></span>
-	    	</div>
-	    	<ul class="dropdown-menu">
-	    		<li class="dropdown-header"><span id="header"></span></li>
-	    		<li><a href="#" id="logout">Logout</a></li>
-	    	</ul>
-	    </div>
-	</nav>
+<body style="min-width: 100%" class="hide"> 
+    <script src="../static/js/intersect.js"></script>
 	<div class="container-fluid">
 	    <div class="row">
 	    	<div class="col-xs-2">
-	    		<ul class="nav nav-sidebar text-center" style="border:1px solid silver;">
+	    		<ul class="nav nav-sidebar text-center" style="border:1px solid #ddd;">
 	    			<li><a href="#" class="tab-notify">Messages</a></li>
 	    			<li><a href="#" class="tab-notify">Challenges</a></li>
+	    			<li><a href="#" id="questions" class="tab-notify">Question Pool</a></li>
 	    		</ul>
 	    	</div>
-	    	<div class="col-xs-8">
-	    		<div id="selected-domain"></div>
-	    		<div class="feed-panel">
-	    			<ol class="feed"></ol>
+	    	<div class="col-xs-7">
+				<div class="feeds">
+		    		<ul class="list-inline">
+		    			<li class='challenge'><a href='#' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#challenger-modal'><span class="glyphicon glyphicon-plus"></span>&nbsp;Challenge</a></li>
+		    		</ul>
+		    		<div class="panel-group"></div>
+		    	</div>
+	    		<ol class="questions"></ol>
+	    	</div>
+	    	<div class="col-xs-3 graphs">
+	    		<div class="graph">
+	    			<h1></h1>
 	    		</div>
 	    	</div>
-	    	<div class="col-xs-2"></div>
 	    </div>
 	    <div id="challenger-modal" class="modal fade" role="dialog">
 		  <div class="modal-dialog">
@@ -53,7 +43,7 @@
 		      <div class="modal-body">
 		      	<form action="" role="form" id="challenger-select-form">
 			        <div class="form-group">
-					  <input type="search" class="form-control" id="challenger" placeholder="Search Email or Username" autofocus>
+					  <input type="search" class="form-control" id="challenger-select" placeholder="Search Email or Username" autofocus>
 				  	</div>
 			  	</form>
 		      </div>
@@ -67,7 +57,6 @@
       };
     </script>
   	<script src="https://apis.google.com/js/client.js?onload=init"></script>
-	<script>const $ = jQuery = require('../static/js/libs/jquery');</script>
 	<script src="../static/js/codegress.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </body>

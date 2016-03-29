@@ -1,9 +1,5 @@
 const ipcRenderer = require('electron').ipcRenderer;
-const $ = jQuery = require('../static/js/libs/jquery');
-const remoteSession = require('electron').remote.session;
-
-var session = remoteSession.fromPartition('persist:codegress');  
-var dataToSend = {}; 
+var dataToSend = {};  
 
 function enableForm(){
     if(localStorage.signed)
@@ -104,6 +100,8 @@ var failedAttempts = 0;
 $('#signin-form').submit(function(event){
     event.preventDefault();
     var isEmpty = emptyFormFields($(this));
+    const remoteSession = require('electron').remote.session;
+    var session = remoteSession.fromPartition('persist:codegress');  
     if(!isEmpty){
         disableSigninButton("Signing in...");
         gapi.client.codegress.user.validateAccount(dataToSend).execute(function(resp){
@@ -142,8 +140,8 @@ $('#signup-form').submit(function(event){
         gapi.client.codegress.user.createAccount(dataToSend).execute(function(resp){
             if(!resp.code && resp.status){
                 localStorage.signed = true;
-                hideSigninForm();
-                showSignupForm();
+                hideSignupForm();
+                showSigninForm();
             }
             else if(!resp.status){
                 var data = resp.data;
