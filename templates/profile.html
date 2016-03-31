@@ -12,13 +12,39 @@
 	
 	<div class="container">
 		<div class="profile-container">
-			<img src="../static/images/codegress/default-handle-img.png" class="profile-image">
+			<div class="profile-image"><img src="../static/images/codegress/default-handle-img.png"></div>
 			<div class="profile-content">
-			<ul class="list-unstyled">
-				<li class="list-group-item"
-				>email</li>
-				<li class="list-group-item">country</li>
-				<li class="list-group-item"></li>
+			<ul>
+				<li class="pencil fullname-pencil"><span class="glyphicon glyphicon-user"></span></span>&nbsp; &nbsp; <span id='fullname'>Fullname</span>  &nbsp; &nbsp; <span class="glyphicon glyphicon-pencil hide pull-right"></span></li>
+				<li class='hide fullname-change'>
+					<form action="">
+						<ul class='list-inline fullname-btns'>
+							<li><input type="text" name="fullname" id="fullname-edit"></li>
+							<li><button class='btn btn-primary btn-xs'><span class="glyphicon glyphicon-ok"></span></button></li>
+							<li><button class='btn btn-default btn-xs'><span class="glyphicon glyphicon-remove"></span></button></button></li>
+						</ul>
+					</form>
+				</li>
+				<li class="pencil email-pencil"><span class="glyphicon glyphicon-envelope"></span>&nbsp; &nbsp; <span id='email'>Email</span>  &nbsp; &nbsp; <span class="glyphicon glyphicon-pencil hide pull-right"></span></li>
+				<li class='hide email-change'>
+					<form action="">
+						<input type="text" name="email" id="email-edit">
+						<ul class='list-inline email-btns'>
+							<li><button class='btn btn-primary btn-xs'>Save</button></li>
+							<li><button class='btn btn-default btn-xs'>Cancel</button></li>
+						</ul>
+					</form>
+				</li>
+				<li class="pencil country-pencil"><span class="glyphicon glyphicon-globe"></span>&nbsp; &nbsp; <span id='country'>Country</span>  &nbsp; &nbsp;<span class="glyphicon glyphicon-pencil hide pull-right"></span></li>
+				<li class='hide country-change'>
+					<form action="">
+						<input type="text" name="country" id="country-edit">
+						<ul class='list-inline country-btns'>
+							<li><button class='btn btn-primary btn-xs'>Save</button></li>
+							<li><button class='btn btn-default btn-xs'>Cancel</button></li>
+						</ul>
+					</form>
+				</li>
 			</ul>
 			</div>
 		</div>

@@ -184,14 +184,38 @@ hr{
 
 }
 .profile-image{
+	text-align: center;
+}
+.profile-image > img{
 	width: 50%;
 }
 .profile-container{
-	text-align: center;
-	width:20%;
+	width:23%;
 }
 .profile-content{
 	margin-top: 10px;
 	border: 1px solid silver;
-	height: 300px;
+	height: 150px;
+}
+.profile-content > ul {
+	list-style-type: none;
+	padding: 5px;
+}
+.profile-content > ul > li {
+	padding: 10px;
+}
+.profile-content > ul > li > span {
+	padding-left: 1px;
+}
+.glyphicon-pencil{
+	cursor: pointer;
+}
+.fullname-btns{
+	margin-top: 10px;
+}
+.email-btns{
+	margin-top: 10px;
+}
+.country-btns{
+	margin-top: 10px;
 }
