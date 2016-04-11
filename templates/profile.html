@@ -11,44 +11,69 @@
 	<script src="../static/js/intersect.js"></script>
 	
 	<div class="container">
-		<div class="profile-container">
-			<div class="profile-image"><img src="../static/images/codegress/default-handle-img.png"></div>
-			<div class="profile-content">
-			<ul>
-				<li class="pencil fullname-pencil"><span class="glyphicon glyphicon-user"></span></span>&nbsp; &nbsp; <span id='fullname'>Fullname</span>  &nbsp; &nbsp; <span class="glyphicon glyphicon-pencil hide pull-right"></span></li>
-				<li class='hide fullname-change'>
-					<form action="">
-						<ul class='list-inline fullname-btns'>
-							<li><input type="text" name="fullname" id="fullname-edit"></li>
-							<li><button class='btn btn-primary btn-xs'><span class="glyphicon glyphicon-ok"></span></button></li>
-							<li><button class='btn btn-default btn-xs'><span class="glyphicon glyphicon-remove"></span></button></button></li>
-						</ul>
-					</form>
-				</li>
-				<li class="pencil email-pencil"><span class="glyphicon glyphicon-envelope"></span>&nbsp; &nbsp; <span id='email'>Email</span>  &nbsp; &nbsp; <span class="glyphicon glyphicon-pencil hide pull-right"></span></li>
-				<li class='hide email-change'>
-					<form action="">
-						<input type="text" name="email" id="email-edit">
-						<ul class='list-inline email-btns'>
-							<li><button class='btn btn-primary btn-xs'>Save</button></li>
-							<li><button class='btn btn-default btn-xs'>Cancel</button></li>
-						</ul>
-					</form>
-				</li>
-				<li class="pencil country-pencil"><span class="glyphicon glyphicon-globe"></span>&nbsp; &nbsp; <span id='country'>Country</span>  &nbsp; &nbsp;<span class="glyphicon glyphicon-pencil hide pull-right"></span></li>
-				<li class='hide country-change'>
-					<form action="">
-						<input type="text" name="country" id="country-edit">
-						<ul class='list-inline country-btns'>
-							<li><button class='btn btn-primary btn-xs'>Save</button></li>
-							<li><button class='btn btn-default btn-xs'>Cancel</button></li>
-						</ul>
-					</form>
-				</li>
-			</ul>
+		<div class="profile-container" style="display: flex;">
+			<div class="profile-info">
+				<div class="profile-image"> 
+					<img src="../static/images/codegress/default-handle-img.png">
+				</div>
+				<div class="profile-content">
+					<ul>
+						<li class="pull-right"><span class="glyphicon glyphicon-pencil profile-edit"></span><a href="javascript:void(0)"></a></span></li>
+						<li><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;Full Name</li>
+						<li><span class="glyphicon glyphicon-envelope"></span>&nbsp;&nbsp;Email</li>
+						<li><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;Country</li>
+					</ul>
+				</div>
+			</div>
+			<div class="profile-editor hide">
+				<form action="">
+					<ul class="edit-input">
+						<li>Name</li>
+						<li>
+							<div class="row">
+							  <div class="col-xs-9"><input class="form-control"name="user-name" id= "user-name" type="text"></div>
+							  <div class="col-xs-3"> </div>
+							</div>
+						</li>
+						<li>Email</li>
+						<li>
+							<div class="row">
+							  <div class="col-xs-9"><input class="form-control"name="email" id= "email" type="text"></div>
+							  <div class="col-xs-3"> </div>
+							</div>
+						</li>
+						<li>Country</li>
+						<li>
+							<div class="row">
+							  <div class="col-xs-9"><input class="form-control"name="country" id= "country" type="text"></div>
+							  <div class="col-xs-3"> </div>
+							</div>
+						</li>
+						<button>Save</button>
+					</ul>
+					<hr>
+					<ul class="edit-password">
+						<li>Old Password</li>
+						<li>
+							<div class="row">
+							  <div class="col-xs-9"><input class="form-control"name="old-password" id= "old-password" type="text"></div>
+							  <div class="col-xs-3"> </div>
+							</div>
+						</li>
+						<li>New Password</li>
+						<li>
+							<div class="row">
+							  <div class="col-xs-9"><input class="form-control"name="new-password" id= "new-password" type="text"></div>
+							  <div class="col-xs-3"> </div>
+							</div>
+						</li>
+					</ul>
+				</form>
 			</div>
 		</div>
 	</div>
+	
+	
 
 	<script src="../static/js/profile.js"></script>
 	<script>

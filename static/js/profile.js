@@ -9,34 +9,46 @@ function actualInit(apiRoot){
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
 };
 
-$('.pencil').mouseenter(function(){
-	$(this).children('.glyphicon-pencil').removeClass('hide');
-	});
-
-$('.pencil').mouseleave(function(){
-	$(this).children('.glyphicon-pencil').addClass('hide');
-	});
-
-$('.fullname-pencil > .glyphicon-pencil').click(function(){
-	 $('.fullname-pencil').addClass('hide');
-	 var fullname = $('#fullname').text();
-	 $('#fullname-edit').val(fullname);
-	 $('.fullname-change').removeClass('hide');
+$('.profile-edit').click(function(){
+	$('.profile-editor').removeClass('hide');
 
 });
 
-$('.email-pencil > .glyphicon-pencil').click(function(){
-	 $('.email-pencil').addClass('hide');
-	 var email = $('#email').text();
-	 $('#email-edit').val(email);
-	 $('.email-change').removeClass('hide');
+// $('.pencil').mouseenter(function(){
+// 	$(this).children('.glyphicon-pencil').removeClass('hide');
+// 	});
 
-});
+// $('.pencil').mouseleave(function(){
+// 	$(this).children('.glyphicon-pencil').addClass('hide');
+// 	});
 
-$('.country-pencil > .glyphicon-pencil').click(function(){
-	 $('.country-pencil').addClass('hide');
-	 var country = $('#country').text();
-	 $('#country-edit').val(country);
-	 $('.country-change').removeClass('hide');
+// var hidePencils = function(){
+// 	$('.glyphicon .glyphicon-pencil').addClass('hide');
+// };
 
-});
+// $('.fullname-pencil > .glyphicon-pencil').click(function(){
+// 	hidePencils();
+// 	 $('.fullname-pencil').addClass('hide');
+// 	 var fullname = $('#fullname').text();
+// 	 $('#fullname-edit').val(fullname);
+// 	 $('.fullname-change').removeClass('hide');
+
+// });
+
+// $('.email-pencil > .glyphicon-pencil').click(function(){
+// 	hidePencils();
+// 	 $('.email-pencil').addClass('hide');
+// 	 var email = $('#email').text();
+// 	 $('#email-edit').val(email);
+// 	 $('.email-change').removeClass('hide');
+
+// });
+
+// $('.country-pencil > .glyphicon-pencil').click(function(){
+// 	hidePencils();
+// 	 $('.country-pencil').addClass('hide');
+// 	 var country = $('#country').text();
+// 	 $('#country-edit').val(country);
+// 	 $('.country-change').removeClass('hide');
+
+// });

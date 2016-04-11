@@ -187,15 +187,15 @@ hr{
 	text-align: center;
 }
 .profile-image > img{
-	width: 50%;
+	width: 40%;
 }
-.profile-container{
-	width:23%;
+.profile-info{
+	width: 25%;
 }
 .profile-content{
 	margin-top: 10px;
 	border: 1px solid silver;
-	height: 150px;
+	height: 200px;
 }
 .profile-content > ul {
 	list-style-type: none;
@@ -210,12 +210,26 @@ hr{
 .glyphicon-pencil{
 	cursor: pointer;
 }
-.fullname-btns{
-	margin-top: 10px;
+.edit-profile{
+	padding-right: 10px;
+	padding-top: 10px;
 }
-.email-btns{
-	margin-top: 10px;
+.profile-editor{
+	margin: auto;
+	width:70%;
+	border: 1px solid silver;
 }
-.country-btns{
-	margin-top: 10px;
+ .profile-editor > form  > ul {
+	list-style-type: none;
+	padding :15px;
 }
+.profile-editor>form > ul > li {
+	padding: 8px;
+}
+.edit-input{
+	margin : auto;
+}
+ 
+ 
+ 
+ 
