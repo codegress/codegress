@@ -9,11 +9,27 @@ function actualInit(apiRoot){
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
 };
 
-$('.profile-edit').click(function(){
-	$('.profile-editor').removeClass('hide');
+$('.personal-edit').click(function(){
+	$('.personal-editor').removeClass('hide');
+	$('.password-editor').addClass('hide');
 
 });
 
+$('.password-edit').click(function(){
+	$('.password-editor').removeClass('hide');
+	$('.personal-editor').addClass('hide');
+
+});
+
+$('.profile-image > img').mouseenter(function(){
+	$('#camera').removeClass('hide');
+
+});
+
+$('.profile-image > img').mouseleave(function(){
+	$('#camera').addClass('hide');
+	
+});
 // $('.pencil').mouseenter(function(){
 // 	$(this).children('.glyphicon-pencil').removeClass('hide');
 // 	});

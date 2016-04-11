@@ -5,6 +5,7 @@
 	<title>Profile</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">  
     <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <script>const $ = jQuery = require('../static/js/libs/jquery');</script>
 </head>
 <body class="hide">
@@ -14,45 +15,50 @@
 		<div class="profile-container" style="display: flex;">
 			<div class="profile-info">
 				<div class="profile-image"> 
+
 					<img src="../static/images/codegress/default-handle-img.png">
+					<span id="camera" class="glyphicon glyphicon-camera hide"></span>
 				</div>
 				<div class="profile-content">
-					<ul>
-						<li class="pull-right"><span class="glyphicon glyphicon-pencil profile-edit"></span><a href="javascript:void(0)"></a></span></li>
-						<li><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;Full Name</li>
-						<li><span class="glyphicon glyphicon-envelope"></span>&nbsp;&nbsp;Email</li>
-						<li><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;Country</li>
+			 		<ul class="nav nav-sidebar text-center" style="border:1px solid #ddd;">
+		    			<li><a href="#" class="tab-notify personal-edit">Personal Settings</a></li>
+		    			<li><a href="#" class="tab-notify password-edit">Change Password</a></li>
 					</ul>
 				</div>
-			</div>
-			<div class="profile-editor hide">
+				</div>
+			<div class="personal-editor hide">
 				<form action="">
 					<ul class="edit-input">
-						<li>Name</li>
+						<li><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;Name</li>
 						<li>
 							<div class="row">
 							  <div class="col-xs-9"><input class="form-control"name="user-name" id= "user-name" type="text"></div>
 							  <div class="col-xs-3"> </div>
 							</div>
 						</li>
-						<li>Email</li>
+						<li><span class="glyphicon glyphicon-envelope"></span>&nbsp;&nbsp;Email</li>
 						<li>
 							<div class="row">
 							  <div class="col-xs-9"><input class="form-control"name="email" id= "email" type="text"></div>
 							  <div class="col-xs-3"> </div>
 							</div>
 						</li>
-						<li>Country</li>
+						<li><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;Country</li>
 						<li>
 							<div class="row">
 							  <div class="col-xs-9"><input class="form-control"name="country" id= "country" type="text"></div>
 							  <div class="col-xs-3"> </div>
 							</div>
 						</li>
-						<button>Save</button>
+						<li><button type="submit" class='btn btn-primary'> Update</button></li>
+						<li></li>
 					</ul>
-					<hr>
-					<ul class="edit-password">
+				</form>
+			</div>
+
+			<div class="password-editor hide">
+				<form action="">
+					<ul class="edit-input">
 						<li>Old Password</li>
 						<li>
 							<div class="row">
@@ -67,9 +73,12 @@
 							  <div class="col-xs-3"> </div>
 							</div>
 						</li>
+						<li><button type="submit" class='btn btn-primary'> Update</button></li>
+						<li></li>
 					</ul>
 				</form>
 			</div>
+		</div>
 		</div>
 	</div>
 	

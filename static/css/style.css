@@ -183,21 +183,30 @@ hr{
 .ack-body{
 
 }
+/*#camera{
+	position: absolute;
+}*/
 .profile-image{
 	text-align: center;
 }
 .profile-image > img{
 	width: 40%;
+	position: relative;
+}
+.profile-image > span{
+	position: absolute;
+	top: 100px;
+	left:275px;
 }
 .profile-info{
 	width: 25%;
 }
 .profile-content{
 	margin-top: 10px;
-	border: 1px solid silver;
+	/*border: 1px solid silver;*/
 	height: 200px;
 }
-.profile-content > ul {
+/*.profile-content > ul {
 	list-style-type: none;
 	padding: 5px;
 }
@@ -206,7 +215,7 @@ hr{
 }
 .profile-content > ul > li > span {
 	padding-left: 1px;
-}
+}*/
 .glyphicon-pencil{
 	cursor: pointer;
 }
@@ -214,16 +223,17 @@ hr{
 	padding-right: 10px;
 	padding-top: 10px;
 }
-.profile-editor{
+.personal-editor,.password-editor{
 	margin: auto;
 	width:70%;
 	border: 1px solid silver;
 }
- .profile-editor > form  > ul {
+ .personal-editor > form  > ul, .password-editor > form > ul {
 	list-style-type: none;
 	padding :15px;
 }
-.profile-editor>form > ul > li {
+.personal-editor>form > ul > li, .password-editor > form > ul >li {
+
 	padding: 8px;
 }
 .edit-input{
