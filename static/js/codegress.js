@@ -5,8 +5,8 @@ function actualInit(apiRoot){
         if(--apisToLoad == 0){
             loadEverything();
         }
-    };
-  apisToLoad = 1;
+    }; 
+  apisToLoad = 1; 
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
 };
 
@@ -43,13 +43,14 @@ function loadEverything(){
 		$('.graphs').addClass('hide');
 	}
 
-	function clearFeed(){
+	function clearPage(){
 		$('.feed').html('');	
+		$('.questions').html('');	
 	}
 
 	var domain = null;
 	function loadQuestions(questions){
-		clearFeed();
+		clearPage();
 		for(var index = 0; index < questions.length;index++){
 			var currentQuestion = questions[index];
 			domain = currentQuestion.domain;
@@ -132,6 +133,7 @@ function loadEverything(){
 		while(--ten != 0) {
 			$('.feeds > .panel-group').append(feed);
 			$('.feed').css('marginBottom','5px');
+			$('.feed-controls').css('paddingLeft','10px');
 		}
 	}();
 }

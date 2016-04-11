@@ -3,7 +3,7 @@ var session = remoteSession.fromPartition('persist:codegress');
 var navbar = `<div class='header'><nav class="navbar"> 
 	  <div class="container-fluid">
 	    <div class="navbar-header">
-    		<a href="codegress.html" class="navbar-brand">
+    		<a href="#" class="navbar-brand">
     		<img id="codegress-logo" style="width:35px;" src="../static/images/codegress/codegress-logo.gif" 
     		alt="codegress logo">
     		</a>
@@ -15,7 +15,7 @@ var navbar = `<div class='header'><nav class="navbar">
 	    		<span class="caret"></span>
 	    	</div>
 	    	<ul class="dropdown-menu">
-	    		<li><a class='swap' href='profile.html' id="header"></a></li>
+	    		<li><a class='swap' href='#' id="header"></a></li>
 	    		<li class='divider'></li>
 	    		<li><a href="#" id="logout">Logout</a></li>
 	    	</ul>
@@ -26,6 +26,8 @@ session.cookies.get({name:'email'},function(error,cookies){
 	if(cookies.length > 0){
 		$('#header').html(cookies[0].value);
 		$('.dropdown').removeClass('hide');
+		$('.navbar-brand').attr('href','codegress.html');
+		$('#header').attr('href','profile.html');
 	} 
 });
 

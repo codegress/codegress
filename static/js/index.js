@@ -1,18 +1,23 @@
 const ipcRenderer = require('electron').ipcRenderer;
-var dataToSend = {};  
+var dataToSend = {};   
 
-function enableForm(){
+function enableForm(){ 
     if(localStorage.signed)
         showSigninForm();
     else
         showSignupForm();
 };
 
-function actualInit(apiRoot){ 
+function showBody(){
+    $('body').removeClass('hide');
+    enableForm();
+}
+
+function initialiseAPI(apiRoot){ 
     var apisToLoad;
     var callback = function(){
         if(--apisToLoad == 0){
-            enableForm();
+            showBody();
         }
     };
     apisToLoad = 1;
@@ -116,12 +121,12 @@ $('#signin-form').submit(function(event){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-email-group'));
                 invalidFeedback($('#signin-password-group'));
-                setStatus("Email / Username not registered yet.");
+                setFeedbackText("Email / Username not registered yet.");
             }
             else if(data.indexOf("password") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-password-group'));
-                setStatus("Password didn't match");
+                setFeedbackText("Password didn't match");
                 clearPasswordField();
                 if(++failedAttempts >= 2){
                     showForgotPassword();
@@ -129,7 +134,7 @@ $('#signin-form').submit(function(event){
             }
         });
     }
-    else setStatus("All fields are required");
+    else setFeedbackText("All fields are required");
 });
 
 $('#signup-form').submit(function(event){
@@ -147,17 +152,17 @@ $('#signup-form').submit(function(event){
                 var data = resp.data;
                 if(data.indexOf("username") != -1){
                     invalidFeedback('#signup-username-group');
-                    setStatus("Username already taken");
+                    setFeedbackText("Username already taken");
                 }
                 if(data.indexOf("email") != -1){
                     invalidFeedback('#signup-email-group');
-                    setStatus("Email already taken");
+                    setFeedbackText("Email already taken");
                 }
             }
             else console.log(resp);
         });
     }
-    else setStatus("All are required fields!");
+    else setFeedbackText("All are required fields!");
 });
 
 $('#recover-form').submit(function(event){
@@ -166,7 +171,11 @@ $('#recover-form').submit(function(event){
     if(!isEmpty){
         console.log('Recover email sent..');
     }
-    else setStatus("Enter registered email");
+    else setFeedbackText("Enter registered email");
+});
+
+$('#pass-toggle').click(function(){
+    
 });
 
 // Check if text fields are empty and add appropriate glyphicons
@@ -214,7 +223,7 @@ function clearStatus(){
 }
 
 //Set status
-function setStatus(status){
+function setFeedbackText(status){
     $('.status').html("<p>"+status+"</p>");
     showStatus();
 }

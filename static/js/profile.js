@@ -1,6 +1,6 @@
 function actualInit(apiRoot){
-	var apisToLoad;
-    var callback = function(){
+	var apisToLoad; 
+    var callback = function(){ 
         if(--apisToLoad == 0){
             $('body').removeClass('hide');
         }
@@ -20,7 +20,7 @@ $('.pencil').mouseleave(function(){
 $('.fullname-pencil > .glyphicon-pencil').click(function(){
 	 $('.fullname-pencil').addClass('hide');
 	 var fullname = $('#fullname').text();
-	 $('#fullname-edit').val(fullname);
+	 $('#fullname-edit').attr('placeholder',fullname);
 	 $('.fullname-change').removeClass('hide');
 
 });
@@ -28,7 +28,7 @@ $('.fullname-pencil > .glyphicon-pencil').click(function(){
 $('.email-pencil > .glyphicon-pencil').click(function(){
 	 $('.email-pencil').addClass('hide');
 	 var email = $('#email').text();
-	 $('#email-edit').val(email);
+	 $('#email-edit').attr('placeholder',email);
 	 $('.email-change').removeClass('hide');
 
 });
@@ -36,7 +36,7 @@ $('.email-pencil > .glyphicon-pencil').click(function(){
 $('.country-pencil > .glyphicon-pencil').click(function(){
 	 $('.country-pencil').addClass('hide');
 	 var country = $('#country').text();
-	 $('#country-edit').val(country);
+	 $('#country-edit').attr('placeholder',country);
 	 $('.country-change').removeClass('hide');
 
 });
