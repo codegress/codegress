@@ -15,7 +15,7 @@ app.on('ready',function(){
     }); 
     
     mainWindow.loadURL('file://'+__dirname+'/templates/index.html');
-    // mainWindow.openDevTools();
+    mainWindow.openDevTools();
 
 
     ipcMain.on('swap',function(event,data){

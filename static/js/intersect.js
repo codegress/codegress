@@ -1,12 +1,21 @@
 const remoteSession = require('electron').remote.session;
 var session = remoteSession.fromPartition('persist:codegress'); 
-var navbar = `<div class='header'><nav class="navbar"> 
-	  <div class="container-fluid">
+var navbar = `<div class='header'>
+	<nav class="navbar navbar-default" role='navigation'> 
+	  <div class="container">
 	    <div class="navbar-header">
     		<a href="#" class="navbar-brand">
     		<img id="codegress-logo" style="width:35px;" src="../static/images/codegress/codegress-logo.gif" 
     		alt="codegress logo">
     		</a>
+	    </div>
+	    <div class='navbar-nav navbar-text'>
+			<form id='search-challenge' class='hide' role='form'>
+				<div class='form-group has-feedback'>
+					<span class="glyphicon glyphicon-search form-control-feedback"></span>
+					<input type='search' class='form-control' placeholder='Search for challenger' id='domain-search'>
+				</div>
+			</form>
 	    </div>
 	    <div class="dropdown navbar-right navbar-text hide">
 	    	<div style="margin-right:10px;" data-toggle="dropdown" class="dropdown-toggle handle-image" 
@@ -26,6 +35,7 @@ session.cookies.get({name:'email'},function(error,cookies){
 	if(cookies.length > 0){
 		$('#header').html(cookies[0].value);
 		$('.dropdown').removeClass('hide');
+		$('#search-challenge').removeClass('hide');
 		$('.navbar-brand').attr('href','codegress.html');
 		$('#header').attr('href','profile.html');
 	} 

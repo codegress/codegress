@@ -13,7 +13,7 @@ function actualInit(apiRoot){
 }  
 
 function showEditor(){
-  $('.inner-container').removeClass('hide');
+  $('.inner-container').removeClass('hide'); 
 }
 
 function enableEditor(){
@@ -90,28 +90,35 @@ function loadCompiler(){
     $('#compile-btn').text(text);
   }
 
+  function appendElement(listElement, className){
+    listElement.className = className;
+    $('.ack').append(listElement);
+  }
+
   function success(headerText, bodyText){
-      var listElement = document.createElement('li');
-      var listHeader = document.createElement('div');
-      var listBody = document.createElement('div');
-      listHeader.className = 'text-success';
-      listHeader.innerHTML = headerText;
-      listBody.innerHTML = bodyText;
-      listElement.appendChild(listHeader);
-      listElement.appendChild(listBody);
-      $('.ack').append(listElement);
+      var listElement = createElement(headerText, bodyText);
+      appendElement(listElement,'panel panel-success');
   }
 
   function error(headerText, bodyText){
-      var listElement = document.createElement('li');
-      var listHeader = document.createElement('div');
-      var listBody = document.createElement('div');
-      listHeader.className = 'text-danger';
-      listHeader.innerHTML = headerText;
-      listBody.innerHTML = bodyText;
-      listElement.appendChild(listHeader);
-      listElement.appendChild(listBody);
-      $('.ack').append(listElement);   
+      var listElement = createElement(headerText, bodyText);
+      appendElement(listElement,'panel panel-danger');
+  }
+
+  function createElement(headerText, bodyText){
+    var listElement = document.createElement('li');
+    var listHeader = document.createElement('div');
+    var listBody = document.createElement('div');
+    
+    listHeader.className = 'panel-heading';
+    listHeader.innerHTML = headerText;
+    
+    listBody.className = 'panel-body';
+    listBody.innerHTML = bodyText;
+    
+    listElement.appendChild(listHeader);
+    listElement.appendChild(listBody);
+    return listElement;
   }
 
   var testCasePassed = 0;
@@ -122,7 +129,10 @@ function loadCompiler(){
         error("Error : ",formattedData);
     }
     else {
-      success("Success : ",formattedData);
+      var headerText = "Custom Output : ";
+      if(!hasCustomInput()) 
+        headerText = "Success : ";
+      success(headerText,formattedData);
       ++testCasePassed;
       console.log(testCasePassed);
     }
@@ -186,6 +196,7 @@ function loadCompiler(){
   /*runs the code against given test case input and acknowledges output*/
   function genericRunner(fileName, command, inputPipe,actualOutput){
     var out = "", err = "";
+    if(!inputPipe) return;
     var genericProcess = childProcess(command, [fileName],{
       stdio:[inputPipe, 'pipe','pipe']
     });
@@ -293,7 +304,6 @@ function loadCompiler(){
 
   function submitCode(){
     var user = null;
-    console.log(testCasePassed);
     if(testCasePassed == testCaseData.length){
       session.cookies.get({name:'email'},function(error,cookies){
         if(cookies.length > 0) {
@@ -301,18 +311,21 @@ function loadCompiler(){
         }
       });
     }
-    gapi.client.codegress.submission.addSubmission(
-      {
-        ques_title:qTitle,
-        submission_text:editor.getValue(),
-        submitted_user:user
-      }
-        ).execute(function(response){
-        if(!response.code){
-          console.log('Submission saved');
+    if(user != null){
+      gapi.client.codegress.submission.addSubmission(
+        {
+          ques_title:qTitle,
+          submission_text:editor.getValue(),
+          submitted_user:user
         }
-        else console.log(response);
-      });
+          ).execute(function(response){
+          if(!response.code){
+            console.log('Submission saved');
+          }
+          else console.log(response);
+        });
+    }
+    else console.log('Cannot get submitted user');
   }
 
   function scrollToBottom(){

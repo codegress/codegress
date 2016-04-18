@@ -7,9 +7,9 @@
   	<link rel="stylesheet" href="../static/css/style.css">
   	<script>const $ = jQuery = require('../static/js/libs/jquery');</script>
 </head>
-<body style="min-width: 100%" class="hide">  
+<body class="hide">  
     <script src="../static/js/intersect.js"></script>
-	<div class="container-fluid">
+	<div class="container">
 	    <div class="row">
 	    	<div class="col-xs-2">
 	    		<ul class="nav nav-sidebar text-center" style="border:1px solid #ddd;">
@@ -18,11 +18,18 @@
 	    			<li><a href="#" id="questions" class="tab-notify">Question Pool</a></li>
 	    		</ul>
 	    	</div>
+	    	<div class="col-xs-7">
+				<ul class="list-inline" id='domain-select'>
+					<li><a href="#" class="btn btn-primary btn-xs">Strings</a></li>
+					<li><a href="#" class="btn btn-primary btn-xs">Stacks</a></li>
+					<li><a href="#" class="btn btn-primary btn-xs">Arrays</a></li>
+					<li><a href="#" class="btn btn-primary btn-xs">Linked Lists</a></li>
+					<li><a href="#" class="btn btn-primary btn-xs">Data Structures</a></li>
+				</ul>
+				<hr>
+	    	</div>
 	    	<div class="col-xs-7">  
 				<div class="feeds">
-		    		<ul class="list-inline">
-		    			<li class='challenge'><a href='#' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#challenger-modal'><span class="glyphicon glyphicon-fire"></span>&nbsp;Challenge</a></li>
-		    		</ul>
 		    		<div class="panel-group"></div>
 		    	</div>
 	    		<ol class="questions"></ol>
@@ -36,18 +43,19 @@
 	    <div id="challenger-modal" class="modal fade" role="dialog">
 		  <div class="modal-dialog">
 		    <div class="modal-content">
-		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal">&times;</button>
-		        <h4 class="modal-title">Select a challenger</h4>
-		      </div>
 		      <div class="modal-body">
-		      	<form action="" role="form" id="challenger-select-form">
+		      <button type="button" class="close" data-dismiss="modal">&times;</button>
+		      	<label for="challenger-select"><h5>Select a challenger</h5></label><hr>
+		      	<form action="" role="form" id="challenger-select-form" class="">
 			        <div class="form-group">
-					  <input type="search" class="form-control" id="challenger-select" placeholder="Search Email or Username" autofocus>
+					  <input type="search" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
 				  	</div>
 			  	</form>
+			  	<hr>
+			  	<div class="or-customize">
+			  	<a href="javascript:void(0)" id='customize-challenge'>Customize Challenge</a></div>
 		      </div>
-		    </div>
+	    	</div>
 		  </div>
 		</div>
 	</div>

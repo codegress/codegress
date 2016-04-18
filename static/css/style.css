@@ -191,26 +191,18 @@ hr{
 }
 .profile-image > img{
 	width: 40%;
-<<<<<<< HEAD
-}
-=======
-	position: relative;
 }
 .profile-image > span{
 	position: absolute;
 	top: 100px;
 	left:275px;
 }
->>>>>>> 4b852c71fa67c4f0e6b420641d8866b30ab80f62
 .profile-info{
 	width: 25%;
 }
 .profile-content{
 	margin-top: 10px;
-<<<<<<< HEAD
 	border: 1px solid silver;
-=======
->>>>>>> 4b852c71fa67c4f0e6b420641d8866b30ab80f62
 	height: 200px;
 }
 /*.profile-content > ul {
@@ -229,13 +221,10 @@ hr{
 .edit-profile{
 	padding-right: 10px;
 	padding-top: 10px;
-<<<<<<< HEAD
 }
 .profile-editor{
 	width:70%;
 	border: 1px solid silver;
-}
-=======
 }
 .personal-editor,.password-editor{
 	margin: auto;
@@ -253,8 +242,13 @@ hr{
 .edit-input{
 	margin : auto;
 }
- 
- 
- 
- 
->>>>>>> 4b852c71fa67c4f0e6b420641d8866b30ab80f62
+.challenge-options{
+	margin-top: 5px;
+	margin-left: 10px;
+}
+.challenge-options > li{
+	cursor: pointer;
+}
+.or-customize{
+	margin-top: 10px;
+}

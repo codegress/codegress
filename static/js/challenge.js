@@ -1,6 +1,6 @@
 const ipcRenderer = require('electron').ipcRenderer;
 var loggedUser = null;
-session.cookies.get({name:'email'},function(error,cookies){
+session.cookies.get({name:'email'},function(error,cookies){ 
 	if(cookies.length > 0){
 		loggedUser = cookies[0].value;
 		$('#header').html(loggedUser); 
