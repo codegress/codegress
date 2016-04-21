@@ -188,6 +188,11 @@ function loadEverything(){
 		$('.comment').click(function(){
 			$(this).parent().siblings('.panel-footer').children('.comment-section').toggleClass('hide');
 		});
+		$('#challenger-select-form').submit(function(event){
+			event.preventDefault();
+			var challengee = $(this).children('div').children('input').val();
+			console.log(challengee);
+		});
 	}
 
 	$('#domain-select > li').click(function(event){
@@ -200,6 +205,7 @@ function loadEverything(){
 				if(!resp.code){
 					loadSelectedDomain(resp.ques);
 				}
+				else console.log('Response code : '+resp.code);
 			});
 		}
 		else console.log('User selected same domain again!');
@@ -214,8 +220,8 @@ function loadEverything(){
 	}
 
 	function loadSelectedDomain(questionsList){
+		clearDomain();
 		if(questionsList != null){
-			clearDomain();
 			for(var i = 0;i < questionsList.length;i++){
 				var title = questionsList[i].title;
 				var text = questionsList[i].text;
@@ -251,7 +257,6 @@ function loadEverything(){
 			}
 			eventHandlers();
 		}
-		else console.log('HELLOWORLD');
 	}
 
 	function clearDomain(){

@@ -63,11 +63,11 @@ function loadCompiler(){
     });
   }    
 
-  /* sets language data variable based on selected language */
+  /* Sets language data variable based on selected language */
   $( "#select-lang" ).change(function() {
     disableCompileButton("Fetching Data...");
     var selectedLang = $( "#select-lang option:selected" ).val();
-    $('.ack').addClass('hide');
+    hideAcknowledge();
     gapi.client.codegress.language.getLanguage({'name':selectedLang}).execute(function(response){
         if(!response.code){
           languageData = response.items[0];
@@ -90,54 +90,80 @@ function loadCompiler(){
     $('#compile-btn').text(text);
   }
 
-  function appendElement(listElement, className){
-    listElement.className = className;
+  function appendElement(listElement){
     $('.ack').append(listElement);
   }
 
+  /*Display success testcase*/
   function success(headerText, bodyText){
-      var listElement = createElement(headerText, bodyText);
-      appendElement(listElement,'panel panel-success');
+      var listElement = createElement(headerText, bodyText, true);
+      appendElement(listElement);
   }
 
+  /*Display error or failed testcase*/
   function error(headerText, bodyText){
-      var listElement = createElement(headerText, bodyText);
-      appendElement(listElement,'panel panel-danger');
+      var listElement = createElement(headerText, bodyText, false);
+      appendElement(listElement);
   }
 
-  function createElement(headerText, bodyText){
+  /*Creating new list element*/
+  function createElement(headerText, bodyText, isSuccess){
     var listElement = document.createElement('li');
-    var listHeader = document.createElement('div');
-    var listBody = document.createElement('div');
+    var subList = document.createElement('ul');
+    var subListElementOne = document.createElement('li');
+    var subListElementTwo = document.createElement('li');
+    var subListElementThree = document.createElement('li');
+    subList.className = 'list-inline';
     
-    listHeader.className = 'panel-heading';
-    listHeader.innerHTML = headerText;
-    
-    listBody.className = 'panel-body';
-    listBody.innerHTML = bodyText;
-    
-    listElement.appendChild(listHeader);
-    listElement.appendChild(listBody);
+    var header = document.createElement('span');
+    header.innerHTML = headerText;
+
+    var body = document.createElement('div');
+    body.className = 'testcase-body';
+    if(!isSuccess)
+      body.innerHTML = bodyText;
+
+    var glyphicon = document.createElement('span');
+    if(isSuccess){
+      glyphicon.className = 'glyphicon glyphicon-ok';
+      subListElementTwo.className = 'text-success';
+    }
+    else{
+      glyphicon.className = 'glyphicon glyphicon-remove';
+      subListElementTwo.className = 'text-danger';
+    }
+
+    subListElementOne.appendChild(header);
+    subListElementOne.className = 'toggle-testcase';
+    subListElementTwo.appendChild(glyphicon);
+    // subListElementThree.appendChild(body);
+
+    subList.appendChild(subListElementOne);
+    subList.appendChild(subListElementTwo);
+    // subList.appendChild(subListElementThree);
+
+    listElement.appendChild(subList);
     return listElement;
   }
 
+  /*Displaying the result..*/
   var testCasePassed = 0;
   function acknowledge(data, isError){
     data = escapeHTML(data);
     var formattedData = data.replace(/\r\n|\r|\n/g,'<br>');
     if(isError && !hasCustomInput()){
-        error("Error : ",formattedData);
+        error("Error ",formattedData);
     }
     else {
-      var headerText = "Custom Output : ";
+      var headerText = "Custom Output ";
       if(!hasCustomInput()) 
-        headerText = "Success : ";
-      success(headerText,formattedData);
-      ++testCasePassed;
-      console.log(testCasePassed);
+        headerText = "Success ";
+        success(headerText,formattedData);
+        ++testCasePassed;
     }
   }
 
+  /*Escapes HTML tags*/
   function escapeHTML(unsafe) {
     return unsafe
          .replace(/&/g, "&amp;")
@@ -156,7 +182,7 @@ function loadCompiler(){
     testCaseRunner(fileName, command);
   }
 
-  /*compiles the code for java*/
+  /*Compiles the code for java*/
   function javaCompile(fileName, command){
     
     processStart();
@@ -193,7 +219,7 @@ function loadCompiler(){
     });
   }
 
-  /*runs the code against given test case input and acknowledges output*/
+  /*Runs the code against given test case input and acknowledges output*/
   function genericRunner(fileName, command, inputPipe,actualOutput){
     var out = "", err = "";
     if(!inputPipe) return;
@@ -221,7 +247,7 @@ function loadCompiler(){
         acknowledge(err, true);
       }
       else if(actualOutput){
-        var outputString = 'Output : '+actualOutput+'\nYour output : '+out;
+        var outputString = actualOutput+''+out;
         if(out.replace(/\n\r|\n/,'') == actualOutput){
           acknowledge(outputString, false); 
         }
@@ -277,15 +303,15 @@ function loadCompiler(){
     return !hasError;
   }
   
-  /* handling html elements behaviour during compilation*/
-  function processStart(){
+  /* Handling html elements behaviour during compilation*/
+  function processStart(){  
     disableCompileButton("Processing..");
     $('#loading').css({'display':''});
     hideAcknowledge();
     testCasePassed = 0;
   }
   
-  /* handling html elements behaviour after compilation*/
+  /* Handling html elements behaviour after compilation*/
   function processEnd(){
     enableCompileButton("Compile & Run");
     $('#loading').css({'display':'none'});
@@ -294,7 +320,12 @@ function loadCompiler(){
     // submitCode();
   }
 
+  function addTestCaseHandlers(){
+    
+  }
+
   function showAcknowledge(){
+    addTestCaseHandlers();
     $('.ack').removeClass('hide');
   }
 
@@ -357,7 +388,7 @@ function loadCompiler(){
     }
   }
 
-  /* returns type of input pipe */
+  /* Returns type of input pipe */
   function getInputPipe(inputFile, inputData){
     var inputPipe = 'ignore';
     if(inputFile){
@@ -395,7 +426,7 @@ function loadCompiler(){
         }
         compile(fileName);
       }
-      else alert('No testcase available, use custom cases');
+      else alert('Use custom testcase');
   });
 
   /* Disable/Enable custom inputs */
