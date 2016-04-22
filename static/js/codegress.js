@@ -95,44 +95,46 @@ function loadEverything(){
 	var shortListed = {};
 	$("#challenger-select").keyup(function(event){
 		var selectedChallenger = $(this).val();
-
-		if(((selectedChallenger.length == 1) || (shortListed && shortListed.length > 10)) && event.keyCode != 13){
-			gapi.client.codegress.user.shortListed({name:selectedChallenger}).execute(function(resp){
-				if(!resp.code)
-					shortListed = resp.data;
-				else
-					console.log(resp.data);
-			});
+		if(selectedChallenger && selectedChallenger.length >= 2 && event.keyCode != 13){
+			isValidChallenger(selectedChallenger);
 		}
-		else if(!shortListed)
-			console.log('No challenger found');
 	});
 
 	$('#challenger-select-form').submit(function(event){
 		event.preventDefault();
-
+		var challengee = $(this).children('div').children('input').val();
+		if(shortListed && shortListed.length == 1 && shortListed[0] != loggedUser){
+			addChallenge(loggedUser, challengee, qData.title);
+		}	
+		else alert('Invalid username');
 	});
+
+	function addChallenge(challenger, challengee, questionTitle){
+		if(questionTitle != null){
+			gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques_title:questionTitle}).execute(function(resp){
+				if(!resp.code){
+					console.log(resp);
+				}
+				else console.log(resp.code);
+			});
+		}
+		else console.log('No question selected');
+	}
+
+	function isValidChallenger(selectedChallenger){
+		console.log('Hitting Database');
+		gapi.client.codegress.user.shortListed({name:selectedChallenger}).execute(function(resp){
+			if(!resp.code){
+				shortListed = resp.data;
+			}
+			console.log(shortListed);
+		});
+		return (shortListed.length != 0);
+	}
 
 	$('#customize-challenge').click(function(event){
 		event.preventDefault();
 		console.log('Customize Challenge Page');
-	});
-
-	function isValidChallenger(selectedChallenger){
-		if(selectedChallenger !== loggedUser){
-			for(var i = 0; shortListed && i < shortListed.length;i++){
-				if(selectedChallenger === shortListed[i]){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	$('.challenge').click(function(){
-		var title = $(this).siblings('.title').children('input').val();
-		var text = $(this).siblings('.text').children('input').val();
-		qData = {'question_domain':domain, 'question_title':title, 'question_text':text};
 	});
 	
 	var displayFeeds = function(){
@@ -187,11 +189,6 @@ function loadEverything(){
 		});	
 		$('.comment').click(function(){
 			$(this).parent().siblings('.panel-footer').children('.comment-section').toggleClass('hide');
-		});
-		$('#challenger-select-form').submit(function(event){
-			event.preventDefault();
-			var challengee = $(this).children('div').children('input').val();
-			console.log(challengee);
 		});
 	}
 
