@@ -27,22 +27,6 @@ function loadEverything(){
 		});
 	});
 
-	gapi.client.codegress.question.getQuestion({}).execute(function(resp){
-		if(!resp.code){
-			var questions = resp.ques;
-			$('#questions').click(function(event){
-				event.preventDefault();
-				loadQuestions(questions);
-				hideGraph();
-			});
-		}
-		else console.log(resp);
-	});
-
-	function hideGraph(){
-		$('.graphs').addClass('hide');
-	}
-
 	function clearPage(){
 		$('.feed').html('');	
 		$('.questions').html('');	
@@ -61,38 +45,7 @@ function loadEverything(){
 		addEventHandlers();
 	}
 
-	var qData = {};
-	function addEventHandlers(){
-		$('.solve').click(function(){
-			var title = $(this).siblings('.title').children('input').val();
-			var text = $(this).siblings('.text').children('input').val();
-			qData = {'question_domain':domain, 'question_title':title, 'question_text':text};
-			ipcRenderer.send('load',{url:'compiler.html',qData:qData});
-		});
-
-		$('.comment').click(function(){
-			$(this).siblings('.comment-section').toggleClass('hide');
-		});
-	}
-
-	function addQuestion(title, text){
-		var listQuestion = "<li><h4>"+title+"</h4>";
-		listQuestion += "<h5>"+text+"</h5><ul class='list-inline'>";
-		listQuestion += `<li class='solve' title='Solve'><a href='#' class='btn btn-primary btn-xs'>
-						<span class='glyphicon glyphicon-edit'></span></a>
-						</li>`;
-		listQuestion += `<li class='comment' title='Comment'><a href='#' class='btn btn-primary btn-xs'>
-						<span class='glyphicon glyphicon-option-horizontal'></span></a>
-						</li>`;
-		listQuestion += "<li class='title'><input type='hidden' value='"+title+"'></li>";
-		listQuestion += "<li class='text'><input type='hidden' value='"+text+"'></li>";
-		listQuestion += "<li class='comment-section hide'><input type='text'></li>";
-		listQuestion += "</li></ul>";
-		$('.questions').append(listQuestion);
-		$('.feeds').addClass('hide');
-	}
-
-	var shortListed = {};
+	var qData = {}, shortListed = {};
 	$("#challenger-select").keyup(function(event){
 		var selectedChallenger = $(this).val();
 		if(selectedChallenger && selectedChallenger.length >= 2 && event.keyCode != 13){
@@ -129,7 +82,7 @@ function loadEverything(){
 			}
 			console.log(shortListed);
 		});
-		return (shortListed.length != 0);
+		return (shortListed && shortListed.length != 0);
 	}
 
 	$('#customize-challenge').click(function(event){
@@ -162,31 +115,47 @@ function loadEverything(){
 	};
 
 	function eventHandlers(){
+		
+		function selectedQuestionData(selectedElement){
+			question = $(selectedElement).parent().siblings('div');
+			qData.title = question.children('.question-title').text();
+			qData.text = question.children('.question-content').text();
+			// console.log(qData);
+		}
+
 		$('.like').click(function(){
+			selectedQuestionData($(this));
 			var likeButton = $(this).children('.glyphicon');
 			var likeCount = $(this).children('.like-count');
+			var likes = {username:loggedUser};
 			if(likeButton.hasClass('text-primary')){
 				likeButton.removeClass('text-primary');
 				likeButton.parent().attr('title','Like');
-				likeCount.html(parseInt(likeCount.text())-1);
+				likes.liked = false;
 			}
 			else{
 				likeButton.addClass('text-primary');
 				likeButton.parent().attr('title','Unlike');
-				likeCount.html(parseInt(likeCount.text())+1);
+				likes.liked = true;
+			}
+			if(likes.liked){
+				gapi.client.codegress.question.addQuestionLike({title:qData.title, domain:qData.domain,likes:[likes]}).execute(function(resp){
+					if(resp.code) {
+						console.log(resp);
+					}
+				});
 			}
 		});
+
 		$('.challenge').click(function(){
-			question = $(this).parent().siblings('div');
-			qData.title = question.children('.question-title').text();
-			qData.text = question.children('.question-content').text();
+			selectedQuestionData($(this));
 		});
+		
 		$('.solve').click(function(){
-			var title = $(this).parent().siblings('.panel-heading').children('.question-title').text();
-			var text = $(this).parent().siblings('.panel-body').children('.question-content').text();
-			qData = {'question_domain':domain, 'question_title':title, 'question_text':text};
+			selectedQuestionData($(this));
 			ipcRenderer.send('load',{url:'compiler.html',qData:qData});
 		});	
+		
 		$('.comment').click(function(){
 			$(this).parent().siblings('.panel-footer').children('.comment-section').toggleClass('hide');
 		});
@@ -195,12 +164,13 @@ function loadEverything(){
 	$('#domain-select > li').click(function(event){
 		event.preventDefault();
 		domain = $(this).children('a').text();
+		qData.domain = domain;
 		var questions = null;
 		if(!$(this).hasClass('active')){
 			activateDomain($(this));
-			gapi.client.codegress.question.getQuestion({domain:domain}).execute(function(resp){
+			gapi.client.codegress.question.getDomain({domain:domain}).execute(function(resp){
 				if(!resp.code){
-					loadSelectedDomain(resp.ques);
+					loadSelectedDomain(resp.items);
 				}
 				else console.log('Response code : '+resp.code);
 			});
@@ -222,13 +192,17 @@ function loadEverything(){
 			for(var i = 0;i < questionsList.length;i++){
 				var title = questionsList[i].title;
 				var text = questionsList[i].text;
+				var likeCount = 0;
+				if(questionsList[i].likes){
+					likeCount = questionsList[i].likes.length;
+				}
 				var feed = `<div class="panel panel-default feed">
 					<div class="panel-heading feed-title"><span class='question-title'>`+title+`</span><span class="pull-right date">Date</span></div>
 					<div class="panel-body">
 						<span class='question-content'>`+text+`</span>
 					</div>
 					<ul class='list-inline challenge-options'>
-						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;(<span class='like-count'>0</span>)</li>
+						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;(<span class='like-count'>`+likeCount+`</span>)</li>
 						<li title='Challenge' class='challenge'>
 							<span class='glyphicon glyphicon-share' data-toggle='modal' data-target='#challenger-modal'></span>&nbsp;(<span class='challenge-count'>0</span>)
 						</li>
