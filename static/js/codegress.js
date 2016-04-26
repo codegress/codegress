@@ -27,24 +27,6 @@ function loadEverything(){
 		});
 	});
 
-	function clearPage(){
-		$('.feed').html('');	
-		$('.questions').html('');	
-	}
-
-	var domain = null;
-	function loadQuestions(questions){
-		clearPage();
-		for(var index = 0; index < questions.length;index++){
-			var currentQuestion = questions[index];
-			domain = currentQuestion.domain;
-			var title = currentQuestion.title;
-			var text = currentQuestion.text;
-			addQuestion(title, text);
-		}
-		addEventHandlers();
-	}
-
 	var qData = {}, shortListed = {};
 	$("#challenger-select").keyup(function(event){
 		var selectedChallenger = $(this).val();
@@ -55,27 +37,75 @@ function loadEverything(){
 
 	$('#challenger-select-form').submit(function(event){
 		event.preventDefault();
-		var challengee = $(this).children('div').children('input').val();
+		var challengerInput = $(this).children('div').children('input');
+		var challengee = challengerInput.val();
+		challengerInput.val('');
 		if(shortListed && shortListed.length == 1 && shortListed[0] != loggedUser){
 			addChallenge(loggedUser, challengee, qData.title);
 		}	
-		else alert('Invalid username');
+		else alert('Enter valid username');
 	});
+
+	$('#challenges').click(function(event){
+		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			loadChallenges(resp.items);
+			console.log(resp.items);
+		});
+	});
+
+	function loadChallenges(challengeList){
+		$('.feeds').addClass('hide');
+		$('.challenge-list').html('');
+		if(challengeList){
+			for(var i = 0;i < challengeList.length;i++){
+				var challenge = challengeList[i];
+				var listElement = `<li>
+					<div class='challenge'>
+						<ul class='list-inline'>
+							<li><a href='#' class='challenge-title'>`+challenge.ques.title+`</a></li>
+							<li><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
+							<li class='pull-right'><a href='#' class='challenge-solve' title='Solve'>
+								<span class='glyphicon glyphicon-edit'></span>
+							</a></li>
+							<li class='pull-right'><a href='#' class='challenge-view' title='View'>
+								<span class='glyphicon glyphicon-eye-open'></span>
+							</a></li>
+						</ul>
+					</div>
+					<div class='challenge-content'>
+					<div class='question-title'>`
+					+challenge.ques.title+	
+					`</div>
+					<div class='question-text'>`
+					+challenge.ques.text+	
+					`</div>
+					</div>
+				</li>`;
+				$('.challenge-list').append(listElement);
+			}
+		}
+	}
 
 	function addChallenge(challenger, challengee, questionTitle){
 		if(questionTitle != null){
-			gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques_title:questionTitle}).execute(function(resp){
+			var question = null;
+			gapi.client.codegress.question.getQuestion({title:qData.title, domain:qData.domain}).execute(function(resp){
 				if(!resp.code){
-					console.log(resp);
+					question = resp.items[0];
+					gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques:question}).execute(function(resp){
+						if(!resp.code){
+							console.log(resp);
+						}
+						else console.log(resp.code);
+					});
 				}
-				else console.log(resp.code);
+				else console.log(resp);
 			});
 		}
 		else console.log('No question selected');
 	}
 
 	function isValidChallenger(selectedChallenger){
-		console.log('Hitting Database');
 		gapi.client.codegress.user.shortListed({name:selectedChallenger}).execute(function(resp){
 			if(!resp.code){
 				shortListed = resp.data;
@@ -89,30 +119,6 @@ function loadEverything(){
 		event.preventDefault();
 		console.log('Customize Challenge Page');
 	});
-	
-	var displayFeeds = function(){
-		var feed = `<div class="panel panel-default feed">
-					<div class="panel-heading feed-title"><span class='question-title'>(Feed Title)</span><span class="pull-right date">Date</span></div>
-					<div class="panel-body">
-						<span class='question-content'>(Feed Content)</span>
-					</div>
-					<ul class='list-inline challenge-options'>
-						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;(<span class='like-count'>0</span>)</li>
-						<li title='Challenge' class='challenge'>
-							<span class='glyphicon glyphicon-fire' data-toggle='modal' data-target='#challenger-modal'></span>&nbsp;(<span class='challenge-count'>0</span>)
-						</li>
-						<li title='Solve' class='solve'><span class='glyphicon glyphicon-edit'></span>&nbsp;(<span class='solve-count'>0</span>)</li>
-						<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
-					</ul>
-				</div>`;
-		var ten = 10;
-		while(--ten != 0) {
-			$('.feeds > .panel-group').append(feed);
-			$('.feed').css('marginBottom','5px');
-			$('.feed-controls').css('paddingLeft','10px');
-		}
-		
-	};
 
 	function eventHandlers(){
 		
@@ -120,7 +126,6 @@ function loadEverything(){
 			question = $(selectedElement).parent().siblings('div');
 			qData.title = question.children('.question-title').text();
 			qData.text = question.children('.question-content').text();
-			// console.log(qData);
 		}
 
 		$('.like').click(function(){
@@ -175,7 +180,9 @@ function loadEverything(){
 				else console.log('Response code : '+resp.code);
 			});
 		}
-		else console.log('User selected same domain again!');
+		if($('.feeds').hasClass('hide')){
+			$('.feeds').removeClass('hide');
+		}
 	});
 
 	function activateDomain(selectedDomain){

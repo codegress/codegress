@@ -13,26 +13,26 @@
 	    <div class="row">
 	    	<div class="col-xs-2">
 	    		<ul class="nav nav-sidebar text-center" style="border:1px solid #ddd;">
-	    			<li><a href="#" class="tab-notify">Messages</a></li>
-	    			<li><a href="#" class="tab-notify">Challenges</a></li>
+	    			<li><a href="#" id="messages" class="tab-notify">Messages</a></li>
+	    			<li><a href="#" id="challenges" class="tab-notify">Challenges</a></li>
 	    			<li><a href="#" id="questions" class="tab-notify">Question Pool</a></li>
 	    		</ul>
 	    	</div>
-	    	<div class="col-xs-7">
-				<ul class="list-inline" id='domain-select'>
-					<li><a href="#" class="btn btn-primary btn-xs">Strings</a></li>
-					<li><a href="#" class="btn btn-primary btn-xs">Stacks</a></li>
-					<li><a href="#" class="btn btn-primary btn-xs">Arrays</a></li>
-					<li><a href="#" class="btn btn-primary btn-xs">Linked Lists</a></li>
-					<li><a href="#" class="btn btn-primary btn-xs">Data Structures</a></li>
-				</ul>
-				<hr>
-	    	</div>
 	    	<div class="col-xs-7">  
 				<div class="feeds">
+					<ul class="list-inline" id='domain-select'>
+						<li><a href="#" class="btn btn-primary btn-xs">Strings</a></li>
+						<li><a href="#" class="btn btn-primary btn-xs">Stacks</a></li>
+						<li><a href="#" class="btn btn-primary btn-xs">Arrays</a></li>
+						<li><a href="#" class="btn btn-primary btn-xs">Linked Lists</a></li>
+						<li><a href="#" class="btn btn-primary btn-xs">Data Structures</a></li>
+					</ul>
+					<hr>
 		    		<div class="panel-group"></div>
 		    	</div>
-	    		<ol class="questions"></ol>
+		    	<div class="challenge-wrapper">
+		    		<ol class="challenge-list"></ol>
+		    	</div>
 	    	</div>
 	    	<div class="col-xs-3 graphs">
 	    		<div class="graph">
