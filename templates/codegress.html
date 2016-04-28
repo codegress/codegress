@@ -15,28 +15,35 @@
 	    		<ul class="nav nav-sidebar text-center" style="border:1px solid #ddd;">
 	    			<li><a href="#" id="messages" class="tab-notify">Messages</a></li>
 	    			<li><a href="#" id="challenges" class="tab-notify">Challenges</a></li>
-	    			<li><a href="#" id="questions" class="tab-notify">Question Pool</a></li>
+	    			<li><a href="#" id="domains" class="tab-notify">Domains</a></li>
 	    		</ul>
 	    	</div>
 	    	<div class="col-xs-7">  
 				<div class="feeds">
-					<ul class="list-inline" id='domain-select'>
-						<li><a href="#" class="btn btn-primary btn-xs">Strings</a></li>
-						<li><a href="#" class="btn btn-primary btn-xs">Stacks</a></li>
-						<li><a href="#" class="btn btn-primary btn-xs">Arrays</a></li>
-						<li><a href="#" class="btn btn-primary btn-xs">Linked Lists</a></li>
-						<li><a href="#" class="btn btn-primary btn-xs">Data Structures</a></li>
+					<ul class="nav nav-tabs" id='domain-select' style="display: none;">
+						<li><a href="#" data-toggle="tab">Strings</a></li>
+						<li><a href="#" data-toggle="tab" >Stacks</a></li>
+						<li><a href="#" data-toggle="tab" >Arrays</a></li>
+						<li><a href="#" data-toggle="tab" >Linked Lists</a></li>
+						<li><a href="#" data-toggle="tab" >Data Structures</a></li>
 					</ul>
-					<hr>
 		    		<div class="panel-group"></div>
+		    		<div class="domain-questions"></div>
 		    	</div>
 		    	<div class="challenge-wrapper">
 		    		<ol class="challenge-list"></ol>
 		    	</div>
+		    	<div class=" follow-suggestions">
+			    	<ul class="list-inline">
+			    		
+			    	</ul>
+			    </div>
 	    	</div>
 	    	<div class="col-xs-3 graphs">
-	    		<div class="graph">
-	    			<h1></h1>
+	    		<div class="graphs">
+	    			<div>
+	    				<a href="#" class="discover-followers">Find people to follow</a>
+	    			</div>
 	    		</div>
 	    	</div>
 	    </div>

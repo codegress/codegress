@@ -57,7 +57,7 @@ hr{
 	
 }
 .feed{
-	
+	margin-top: 5px;
 }
 .feed-title{
 	font-family: "Droid Sans";
@@ -65,19 +65,24 @@ hr{
 	color: #666;
 }
 .feed-body{
-	padding: 0px 0px 5px 5px;
-	color: gray;
-	cursor: pointer;
+	/*padding:;*/
+	/*color: gray;*/
+	/*cursor: pointer;*/
+	margin:15px;
 }
 
 .feed-body:hover{
 
 }
-/*.challenges{
+.domain-questions{
 	margin-top: 10px;
-	padding: 10px;
-	box-shadow:0px 0px 1px gray;
-}*/
+}
+.question{
+	cursor: pointer;
+	box-shadow: 0px 1px 2px silver;
+	padding-top: 10px;
+	padding-bottom: 5px;	
+}
 .challenge{
 	padding: 10px;
 	margin-bottom: 20px;
@@ -235,7 +240,6 @@ hr{
 	padding :15px;
 }
 .personal-editor>form > ul > li, .password-editor > form > ul >li {
-
 	padding: 8px;
 }
 .edit-input{
@@ -248,6 +252,13 @@ hr{
 .challenge-options > li{
 	cursor: pointer;
 }
-.or-customize{
-	margin-top: 10px;
+.follow-suggestions{
+	
+}
+.follower{
+	text-align: center;
+	width: 100px;
+	padding: 10px;
+	margin:10px;
+	box-shadow: 0px 0.5px 1px silver;
 }
