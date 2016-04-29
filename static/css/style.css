@@ -65,9 +65,6 @@ hr{
 	color: #666;
 }
 .feed-body{
-	/*padding:;*/
-	/*color: gray;*/
-	/*cursor: pointer;*/
 	margin:15px;
 }
 
@@ -209,16 +206,6 @@ hr{
 	border: 1px solid silver;
 	height: 200px;
 }
-/*.profile-content > ul {
-	list-style-type: none;
-	padding: 5px;
-}
-.profile-content > ul > li {
-	padding: 10px;
-}
-.profile-content > ul > li > span {
-	padding-left: 1px;
-}*/
 .glyphicon-pencil{
 	cursor: pointer;
 }
@@ -261,4 +248,12 @@ hr{
 	padding: 10px;
 	margin:10px;
 	box-shadow: 0px 0.5px 1px silver;
+}
+.selected-question > .question-title{
+	margin-bottom: 10px;
+	font-style: italic;
+	font-weight: bold;
+}
+.selected-question > .question-text{
+	margin-bottom: 10px;
 }

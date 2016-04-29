@@ -24,39 +24,11 @@ function initialiseAPI(apiRoot){
     gapi.client.load('codegress', 'v1', callback, apiRoot);
 };
 
-// Coke Studio
-var video_data = {
-    "Koi Lamda":"http://www.youtube.com/embed/wUDpqMdMxTo",
-    "Sammi Meri Waar":"http://www.youtube.com/embed/KHLNSxe5Y8A",
-    "Madari":"http://www.youtube.com/embed/jE_MLCBFKmg",
-    "Badri Badariyan":"http://www.youtube.com/embed/6eP7jzhfXwQ",
-    "Naan Yen":"http://www.youtube.com/embed/e2rGhnGuCy0"
-}
-$('.video-select > li > a').click(function(event){
-    var key = $(this).text();
-    var videoSource = video_data[key];
-    if(videoSource){
-        $('.video-view').attr('src',videoSource);
-    }
-});
-
 // swapping pages using IPC protocol
 $('.swap').click(function(event){
 	event.preventDefault();
 	var htmlPage = $(this).attr('href');
     ipcRenderer.send('swap',{'url':htmlPage});
-});
-
-$('#signup').click(function(event){
-    event.preventDefault();
-    showSignupForm();
-    clearStatus();
-});
-
-$('#signin').click(function(event){
-    event.preventDefault();
-    showSigninForm();
-    clearStatus();
 });
 
 $('#forgot > a').click(function(event){

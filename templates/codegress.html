@@ -51,17 +51,23 @@
 		  <div class="modal-dialog">
 		    <div class="modal-content">
 		      <div class="modal-body">
-		      <button type="button" class="close" data-dismiss="modal">&times;</button>
-		      	<label for="challenger-select"><h5>Select a challenger</h5></label><hr>
-		      	<form action="" role="form" id="challenger-select-form" class="">
-			        <div class="form-group">
+		      	<label for="challenger-select"><h5>Select a challenger</h5></label>
+		      	<form action="" role="form" id="challenger-select-form">
+			        <div class="form-group has-feedback">
 					  <input type="search" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
+					  <span class="glyphicon glyphicon-ok form-control-feedback hide"></span>
 				  	</div>
 			  	</form>
 			  	<hr>
-			  	<div class="or-customize">
-			  	<a href="javascript:void(0)" id='customize-challenge'>Customize Challenge</a></div>
-		      </div>
+			  	<div class="selected-question">
+			  		<div class="question-title"></div>
+			  		<div class="question-text"></div>
+			  	</div>
+		  		<div class="modal-footer">
+			  		<button class="challenge-btn btn btn-primary btn-sm">Challenge</button>
+				  	<button class="cancel-btn btn btn-primary btn-sm" data-dismiss="modal">Cancel</button>
+				 </div>
+				</div>
 	    	</div>
 		  </div>
 		</div>

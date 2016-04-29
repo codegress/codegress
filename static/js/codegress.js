@@ -11,20 +11,21 @@ function actualInit(apiRoot){
 };
 
 function loadEverything(){
+	$('body').removeClass('hide');
 	const remoteSession = require('electron').remote.session;
 	var session = remoteSession.fromPartition('persist:codegress'); 
 	var loggedUser = null;
 
 	session.cookies.get({name:'email'},function(error,cookies){
-		loggedUser = cookies[0].value;
-		console.log("HEY THERE,\nDO YOU LIKE WHAT WE ARE DOING\nTHIS PROJECT IS OPEN SOURCED\nFEEL FREE TO CONTRIBUTE\nhttps://github.com/codegress");
-		gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
-			if(!resp.code){
-				// console.log(resp.feeds);
-				loadChallengeFeeds(resp.feeds);
-				$('body').removeClass('hide');
-			}
-		});
+		if(cookies){
+			loggedUser = cookies[0].value;
+			gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
+				if(!resp.code){
+					loadChallengeFeeds(resp.feeds);
+				}
+			});
+		}
+		else ipcRenderer.send('swap',{url:'index.html'});
 	});
 
 	function loadChallengeFeeds(feedList){
@@ -57,7 +58,7 @@ function loadEverything(){
 						<li title='Solve' class='solve'><span class='glyphicon glyphicon-edit'></span>&nbsp;(<span class='solve-count'>0</span>)</li>
 						<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
 					</ul>
-					<div class='panel-footer'>
+					<div class='panel-footer hide'>
 						<form action='javascript:void(0)' role='form' class='comment-section hide'>
 							<div class='form-group'>
 								<input type='text' class='form-control comment-text'>
@@ -91,23 +92,23 @@ function loadEverything(){
 	var qData = {}, shortListed = {};
 	$("#challenger-select").keyup(function(event){
 		var selectedChallenger = $(this).val();
-		if(selectedChallenger && selectedChallenger.length >= 2 && event.keyCode != 13){
-			isValidChallenger(selectedChallenger);
+		if(selectedChallenger && selectedChallenger.length >= 2){
+			var feedback = $(this).siblings('span')
+			if(isValidChallenger(selectedChallenger)){
+				feedback.parent().addClass('has-success');
+				feedback.removeClass('hide');
+			}
+			else{
+				feedback.parent().removeClass('has-success');
+				feedback.addClass('hide');
+			}
 		}
 	});
 
-	$('#challenger-select-form').submit(function(event){
-		event.preventDefault();
-		var challengerInput = $(this).children('div').children('input');
-		var challengee = challengerInput.val();
-		challengerInput.val('');
-		if(shortListed && shortListed.length == 1 && shortListed[0] != loggedUser){
-			addChallenge(loggedUser, challengee, qData.title);
-		}	
-		else alert('Enter valid username');
-	});
+	// function 
 
 	$('#challenges').click(function(event){
+		clearFeed();
 		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
 			if(!resp.code) 
 				loadChallenges(resp.items);
@@ -117,7 +118,6 @@ function loadEverything(){
 	});
 
 	function loadChallenges(challengeList){
-		$('.feeds').addClass('hide');
 		if(challengeList){
 			$('.challenge-list').html('');
 			for(var i = 0;i < challengeList.length;i++){
@@ -175,7 +175,7 @@ function loadEverything(){
 			}
 			console.log(shortListed);
 		});
-		return (shortListed && shortListed.length != 0);
+		return (shortListed && shortListed.length == 1 && shortListed[0] == selectedChallenger && shortListed[0] != loggedUser);
 	}
 
 	$('#customize-challenge').click(function(event){
@@ -194,6 +194,7 @@ function loadEverything(){
 	});
 
 	function loadFollowSuggestions(followList){
+		clearFeed();
 		if(followList){
 			$('.feeds').addClass('hide');
 			$('.challenge-wrapper').addClass('hide');
@@ -218,6 +219,8 @@ function loadEverything(){
 			question = $(selectedElement).parent().siblings('div');
 			qData.title = question.children('.question-title').text();
 			qData.text = question.children('.question-content').text();
+			$('.selected-question > .question-title').text(qData.title);
+			$('.selected-question > .question-text').text(qData.text);
 		}
 
 		$('.like').click(function(){
@@ -247,7 +250,6 @@ function loadEverything(){
 		$('.challenge-this').click(function(){
 			selectedQuestionData($(this));
 		});
-		
 		$('.solve').click(function(){
 			selectedQuestionData($(this));
 			ipcRenderer.send('load',{url:'compiler.html',qData:qData});
@@ -270,6 +272,7 @@ function loadEverything(){
 
 	$('#domain-select > li').click(function(event){
 		event.preventDefault();
+		clearFeed();
 		domain = $(this).children('a').text();
 		qData.domain = domain;
 		var questions = null;
@@ -329,6 +332,8 @@ function loadEverything(){
 	function clearFeed(){
 		$('.feeds > .domain-questions').html('');
 		$('.feeds > .panel-group').html('');
+		$('.follow-suggestions > ul').html('');
+		$('.challenge-wrapper > ol').html('');
 	}
 
 	function hideFeed(){

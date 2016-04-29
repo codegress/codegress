@@ -38,6 +38,7 @@ session.cookies.get({name:'email'},function(error,cookies){
 		$('#search-challenge').removeClass('hide');
 		$('.navbar-brand').attr('href','codegress.html');
 		$('#header').attr('href','profile.html');
+		console.log("HEY THERE,\nDO YOU LIKE WHAT WE ARE DOING?\nTHIS PROJECT IS OPEN SOURCED\nFEEL FREE TO CONTRIBUTE\nhttps://github.com/codegress");
 	} 
 });
 
