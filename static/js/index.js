@@ -210,9 +210,32 @@ function clearStatus(){
     hideStatus();
 }
 
+function animateSignin(){
+    animate($('.signin'));
+}
+
+function animate(element){
+    element.animate({'margin-left':'20px'},40,function(){
+        $(this).animate({'margin-right':'20px'},40,function(){
+            $(this).css({'margin':'auto'});
+            $(this).animate({'margin-left':'10px'},40,function(){
+                $(this).animate({'margin-right':'10px'},40,function(){
+                    $(this).css({'margin':'auto'});
+                    $(this).animate({'margin-left':'5px'},40,function(){
+                        $(this).animate({'margin-right':'5px'},40,function(){
+                            $(this).css({'margin':'auto'});
+                        })
+                    });
+                })
+            });
+        });    
+    });
+}
+
 //Set status
 function setFeedbackText(status){
     $('.status').html("<p>"+status+"</p>");
+    animateSignin();
     showStatus();
 }
 

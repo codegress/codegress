@@ -351,7 +351,7 @@ function loadEverything(){
 								<button class='btn btn-primary btn-xs'>Solve</button>
 							</li>
 						</ul>
-						<div class='feed-body' style='display:none;'><hr>`+text+`</div>
+						<div class='feed-body' style='display:none;'>`+text+`</div>
 					</div>
 				`;
 				$('.feeds > .domain-questions').append(questionElement);

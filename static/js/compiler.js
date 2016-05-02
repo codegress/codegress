@@ -250,7 +250,7 @@ function loadCompiler(){
         acknowledge(err, true);
       }
       else if(actualOutput){
-        var outputString = actualOutput+''+out;
+        var outputString = actualOutput+' == '+out;
         if(out.replace(/\n\r|\n/,'') == actualOutput){
           acknowledge(outputString, false); 
         }
@@ -383,7 +383,7 @@ function loadCompiler(){
       for(var i = 0; i < testCaseData.length;i++){
         var currentInputData = testCaseData[i].test_in;
         testCaseResponse[currentInputData] = false;
-        var inputFile = "/codegress.asar/input"+(i+1)+".txt";
+        var inputFile = "input"+(i+1)+".txt";
         inputPipes[i] = getInputPipe(inputFile, currentInputData);
         inputData[i] = currentInputData;
         outputData[i] = testCaseData[i].test_out;
@@ -411,7 +411,7 @@ function loadCompiler(){
 
   function getCustomPipe(){
     if(hasCustomInput()){
-      var inputFile = "/codegress.asar/input.txt";
+      var inputFile = "input.txt";
       var customData = getCustomData();
       return getInputPipe(inputFile, customData);
     }
@@ -422,7 +422,7 @@ function loadCompiler(){
       clearAcknowledge();
       if(languageData && (testCaseData || hasCustomInput())){
         const entry = editor.getValue();
-        var fileName = '/codegress.asar/random'+languageData.ext;
+        var fileName = 'random'+languageData.ext;
         writeFile(fileName,entry);
         if(!hasCustomInput()){
           getPipesReady();
