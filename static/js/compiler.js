@@ -8,7 +8,7 @@ function actualInit(apiRoot){
             enableEditor();
         }
     };
-  apisToLoad = 1;
+  apisToLoad = 1; 
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
 }  
 
@@ -120,8 +120,6 @@ function loadCompiler(){
 
     var body = document.createElement('div');
     body.className = 'testcase-body';
-    if(!isSuccess)
-      body.innerHTML = bodyText;
 
     var glyphicon = document.createElement('span');
     if(isSuccess){
@@ -136,13 +134,18 @@ function loadCompiler(){
     subListElementOne.appendChild(header);
     subListElementOne.className = 'toggle-testcase';
     subListElementTwo.appendChild(glyphicon);
-    // subListElementThree.appendChild(body);
+    
 
     subList.appendChild(subListElementOne);
     subList.appendChild(subListElementTwo);
-    // subList.appendChild(subListElementThree);
+    
+    if(!isSuccess){
+      body.innerHTML = bodyText;
+      subListElementThree.appendChild(body);
+      subList.appendChild(subListElementThree);
+    }
 
-    listElement.appendChild(subList);
+    listElement.appendChild(subList); 
     return listElement;
   }
 
@@ -380,7 +383,7 @@ function loadCompiler(){
       for(var i = 0; i < testCaseData.length;i++){
         var currentInputData = testCaseData[i].test_in;
         testCaseResponse[currentInputData] = false;
-        var inputFile = "input"+(i+1)+".txt";
+        var inputFile = "/codegress.asar/input"+(i+1)+".txt";
         inputPipes[i] = getInputPipe(inputFile, currentInputData);
         inputData[i] = currentInputData;
         outputData[i] = testCaseData[i].test_out;
@@ -408,7 +411,7 @@ function loadCompiler(){
 
   function getCustomPipe(){
     if(hasCustomInput()){
-      var inputFile = "input.txt";
+      var inputFile = "/codegress.asar/input.txt";
       var customData = getCustomData();
       return getInputPipe(inputFile, customData);
     }
@@ -419,7 +422,7 @@ function loadCompiler(){
       clearAcknowledge();
       if(languageData && (testCaseData || hasCustomInput())){
         const entry = editor.getValue();
-        var fileName = 'random'+languageData.ext;
+        var fileName = '/codegress.asar/random'+languageData.ext;
         writeFile(fileName,entry);
         if(!hasCustomInput()){
           getPipesReady();

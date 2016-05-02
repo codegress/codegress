@@ -23,6 +23,7 @@ function loadEverything(){
 				if(!resp.code){
 					loadChallengeFeeds(resp.feeds);
 				}
+				else console.log(resp);
 			});
 		}
 		else ipcRenderer.send('swap',{url:'index.html'});
@@ -36,9 +37,6 @@ function loadEverything(){
 				var challenger = feedList[i].challenger;
 				var dateTime = new Date(feedList[i].datetime);
 				var ques = feedList[i].ques;
-				var title = ques.title;
-				var domain = ques.domain;
-				var text = ques.text;
 				var likeCount = 0;
 				var commentCount = 0;
 				if(ques.likes)
@@ -46,9 +44,18 @@ function loadEverything(){
 				if(ques.comments)
 					commentCount = ques.comments.length;
 				var feed = `<div class="panel panel-default feed">
-					<div class="panel-heading feed-title"><span class='question-title'>`+title+`&nbsp;&nbsp;</span>(<span>`+challengee+`</span>&nbsp;&nbsp;<span class='glyphicon glyphicon-arrow-right'></span>&nbsp;&nbsp;<span>`+challenger+`</span>)<span class="pull-right date">`+dateTime+`</span></div>
+					<div class="panel-heading feed-title">
+						<span class='question-title'>`+ques.title+`&nbsp;&nbsp;</span>
+						|<a href='#'>
+							<span class='question-domain'>`+ques.domain+`</span>
+						</a>&nbsp;&nbsp;
+						(<span>`+challengee+`</span>&nbsp;&nbsp;
+						<span class='glyphicon glyphicon-arrow-right'></span>
+						&nbsp;&nbsp;<span>`+challenger+`</span>)
+						<span class="pull-right date">`+dateTime+`</span>
+					</div>
 					<div class="panel-body">
-						<span class='question-content'>`+text+`</span>
+						<span class='question-content'>`+ques.text+`</span>
 					</div>
 					<ul class='list-inline challenge-options'>
 						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;(<span class='like-count'>`+likeCount+`</span>)</li>
@@ -105,8 +112,6 @@ function loadEverything(){
 		}
 	});
 
-	// function 
-
 	$('#challenges').click(function(event){
 		clearFeed();
 		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
@@ -149,8 +154,8 @@ function loadEverything(){
 		}
 	}
 
-	function addChallenge(challenger, challengee, questionTitle){
-		if(questionTitle != null){
+	function addChallenge(challenger, challengee){
+		if(qData.title && qData.domain){
 			var question = null;
 			gapi.client.codegress.question.getQuestion({title:qData.title, domain:qData.domain}).execute(function(resp){
 				if(!resp.code){
@@ -181,6 +186,11 @@ function loadEverything(){
 	$('#customize-challenge').click(function(event){
 		event.preventDefault();
 		console.log('Customize Challenge Page');
+	});
+
+	$('.challenge-btn').click(function(event){
+		event.preventDefault();
+		addChallenge(loggedUser, shortListed[0]);
 	});
 
 	$('.discover-followers').click(function(event){
@@ -223,6 +233,13 @@ function loadEverything(){
 			$('.selected-question > .question-text').text(qData.text);
 		}
 
+		function selectedQuestionDataOverriden(selectedElement){
+			var title = $(selectedElement).siblings('.feed-title').text();
+			var text = $(selectedElement).parent().siblings('.feed-body').text();
+			qData.title = title;
+			qData.text = text;
+		}
+
 		$('.like').click(function(){
 			selectedQuestionData($(this));
 			var likeButton = $(this).children('.glyphicon');
@@ -249,23 +266,38 @@ function loadEverything(){
 
 		$('.challenge-this').click(function(){
 			selectedQuestionData($(this));
+			if(!qData.title || !qData.text){
+				selectedQuestionDataOverriden($(this));
+			}
 		});
 		$('.solve').click(function(){
 			selectedQuestionData($(this));
-			ipcRenderer.send('load',{url:'compiler.html',qData:qData});
+			if(qData.title && qData.text){
+				ipcRenderer.send('load',{url:'compiler.html',qData:qData});
+			}
+			else {
+				selectedQuestionDataOverriden($(this));
+				ipcRenderer.send('load',{url:'compiler.html',qData:qData});
+			}
+			console.log(qData);
 		});	
 		
 		$('.comment').click(function(){
 			$(this).parent().siblings('.panel-footer').children('.comment-section').toggleClass('hide');
 		});
 
-		$('.view').click(function(){
-			var button = $(this).children('button');
-			$(this).parent().siblings('.feed-body').toggle(function(){
-				if(button.text() === "View")
-					button.text("Hide");
-				else
-					button.text("View");
+		$('.challenge-options').click(function(){
+			var solve = $(this).children('.solve');
+			var challenge = $(this).children('.challenge-this');
+			$(this).siblings('.feed-body').toggle(function(){
+				if(solve.hasClass('hide') && challenge.hasClass('hide')){
+					solve.removeClass('hide');
+					challenge.removeClass('hide');
+				}
+				else{
+					solve.addClass('hide');
+					challenge.addClass('hide')	
+				}
 			});
 		});
 	}
@@ -309,14 +341,15 @@ function loadEverything(){
 					likeCount = questionsList[i].likes.length;
 				}
 				var questionElement = `
-					<div class='question'>
+					<div class='question' title='Click to view'>
 						<ul class='list-inline challenge-options'>
 							<li class='feed-title'>`+title+`</li>
-							<li title='Challenge' class='challenge-this pull-right'>
+							<li title='Challenge' class='challenge-this pull-right hide'>
 								<button class='btn btn-primary btn-xs' data-toggle='modal' data-target='#challenger-modal'>Challenge</button>
 							</li>
-							<li title='Solve' class='solve pull-right'><button class='btn btn-primary btn-xs'>Solve</button></li>
-							<li title='View' class='view pull-right'><button class='btn btn-primary btn-xs'>View</button></li>
+							<li title='Solve' class='solve pull-right hide'>
+								<button class='btn btn-primary btn-xs'>Solve</button>
+							</li>
 						</ul>
 						<div class='feed-body' style='display:none;'><hr>`+text+`</div>
 					</div>
