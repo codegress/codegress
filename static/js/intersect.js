@@ -1,7 +1,7 @@
 const remoteSession = require('electron').remote.session;
 var session = remoteSession.fromPartition('persist:codegress'); 
 var navbar = `<div class='header'>
-	<nav class="navbar navbar-default" role='navigation'> 
+	<nav class="navbar" role='navigation'> 
 	  <div class="container">
 	    <div class="navbar-header">
     		<a href="#" class="navbar-brand">

@@ -95,6 +95,7 @@ $('#signin-form').submit(function(event){
     var isEmpty = emptyFormFields($(this));
     const remoteSession = require('electron').remote.session;
     var session = remoteSession.fromPartition('persist:codegress');  
+    var signInElement = $('.signin');
     if(!isEmpty){
         disableSigninButton("Signing in...");
         gapi.client.codegress.user.validateAccount(dataToSend).execute(function(resp){
@@ -105,29 +106,30 @@ $('#signin-form').submit(function(event){
                     else ipcRenderer.send('swap',{'url':'codegress.html'});
                 });
             }
-            else if(resp.code == 503){
-                enableSigninButton("Sign In");
-                invalidFeedback($('#signin-email-group'));
-                invalidFeedback($('#signin-password-group'));
-                setFeedbackText("Email / Username not registered yet.");
-            }
             else if(data.indexOf("password") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-password-group'));
-                setFeedbackText("Password didn't match");
+                setFeedbackText("Password didn't match",signInElement);
                 clearPasswordField();
                 if(++failedAttempts >= 2){
                     showForgotPassword();
                 }
             }
+            else{
+                enableSigninButton("Sign In");
+                invalidFeedback($('#signin-email-group'));
+                invalidFeedback($('#signin-password-group'));
+                setFeedbackText("Email / Username not registered yet.",signInElement);
+            }
         });
     }
-    else setFeedbackText("All fields are required");
+    else setFeedbackText("All fields are required",signInElement);
 });
 
 $('#signup-form').submit(function(event){
     event.preventDefault();
     var isEmpty = emptyFormFields($(this));
+    var signUpElement = $('.signup');
     clearStatus();
     if(!isEmpty){
         gapi.client.codegress.user.createAccount(dataToSend).execute(function(resp){
@@ -136,30 +138,35 @@ $('#signup-form').submit(function(event){
                 hideSignupForm();
                 showSigninForm();
             }
-            else if(!resp.status){
+            else if(!resp.status && resp.data){
                 var data = resp.data;
-                if(data.indexOf("username") != -1){
+                if(data.indexOf("email") != -1 && data.indexOf("username") != -1){
                     invalidFeedback('#signup-username-group');
-                    setFeedbackText("Username already taken");
-                }
-                if(data.indexOf("email") != -1){
                     invalidFeedback('#signup-email-group');
-                    setFeedbackText("Email already taken");
+                    setFeedbackText("Username & Email already taken",signUpElement);
+                }
+                else if(data.indexOf("username") != -1){
+                    invalidFeedback('#signup-username-group');
+                    setFeedbackText("Username already taken",signUpElement);
+                }
+                else if(data.indexOf("email") != -1){
+                    invalidFeedback('#signup-email-group');
+                    setFeedbackText("Email already taken",signUpElement);
                 }
             }
-            else console.log(resp);
         });
     }
-    else setFeedbackText("All are required fields!");
+    else setFeedbackText("All are required fields!",signUpElement);
 });
 
 $('#recover-form').submit(function(event){
     event.preventDefault();
     var isEmpty = emptyFormFields($(this));
+    var recoverElement = $('.recover');
     if(!isEmpty){
         console.log('Recover email sent..');
     }
-    else setFeedbackText("Enter registered email");
+    else setFeedbackText("Enter registered email", recoverElement);
 });
 
 $('#pass-toggle').click(function(){
@@ -169,8 +176,6 @@ $('#pass-toggle').click(function(){
 // Check if text fields are empty and add appropriate glyphicons
 function emptyFormFields(form){
     var empty = false;
-    // clearStatus();
-    // hideForgotPassword();
     var formElements = form.children('div');
     formElements.each(function(){
         var inputElement = $(this).children('input');
@@ -210,10 +215,6 @@ function clearStatus(){
     hideStatus();
 }
 
-function animateSignin(){
-    animate($('.signin'));
-}
-
 function animate(element){
     element.animate({'margin-left':'20px'},40,function(){
         $(this).animate({'margin-right':'20px'},40,function(){
@@ -222,7 +223,7 @@ function animate(element){
                 $(this).animate({'margin-right':'10px'},40,function(){
                     $(this).css({'margin':'auto'});
                     $(this).animate({'margin-left':'5px'},40,function(){
-                        $(this).animate({'margin-right':'5px'},40,function(){
+                        $(this).animate({'margin-right':'5gpx'},40,function(){
                             $(this).css({'margin':'auto'});
                         })
                     });
@@ -233,9 +234,9 @@ function animate(element){
 }
 
 //Set status
-function setFeedbackText(status){
+function setFeedbackText(status,element){
     $('.status').html("<p>"+status+"</p>");
-    animateSignin();
+    animate(element);
     showStatus();
 }
 

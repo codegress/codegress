@@ -46,6 +46,7 @@ function loadCompiler(){
     qDomain = data.domain;
     qTitle = data.title;
     qText = data.text;
+    console.log(data);
     displayQuestion(qTitle, qText);
     getTestCaseData(qTitle);
   });
@@ -60,6 +61,7 @@ function loadCompiler(){
       if(!response.code){
         testCaseData = response.cases;
       }
+      console.log(response);
     });
   }    
 

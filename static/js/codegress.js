@@ -15,19 +15,112 @@ function loadEverything(){
 	const remoteSession = require('electron').remote.session;
 	var session = remoteSession.fromPartition('persist:codegress'); 
 	var loggedUser = null;
+	userFeedTable = {};
 
 	session.cookies.get({name:'email'},function(error,cookies){
 		if(cookies){
 			loggedUser = cookies[0].value;
-			gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
-				if(!resp.code){
-					loadChallengeFeeds(resp.feeds);
-				}
-				else console.log(resp);
-			});
+			loadUserContent();
 		}
 		else ipcRenderer.send('swap',{url:'index.html'});
 	});
+
+	function loadUserContent(){
+		getUserFeeds();
+	}
+
+	function loadFeeds(userFeeds){
+		var newFeeds = [];
+		for(var i = 0;i < userFeeds.length;i++){
+			var feed = userFeeds[i];
+			var key = feed['challenger']+feed['challengee']+feed['ques']['title'];
+			if(!userFeedTable[key]){
+				newFeeds.push(feed);
+				userFeedTable[key] = true;
+			}
+		}
+		if(newFeeds.length > 0)
+			loadNewFeeds(newFeeds);
+	}
+
+	function loadNewFeeds(newFeeds){
+		for(var i = newFeeds.length-1;i >= 0;i--){
+			var newFeed = newFeeds[i];
+			console.log(newFeed);
+			var challengee = newFeed.challengee;
+			var challenger = newFeed.challenger;
+			var domain = newFeed.ques.domain;
+			var title = newFeed.ques.title;
+			var text = newFeed.ques.text;
+			var dateTime = new Date(newFeed.datetime);
+			var likeCount = 0;
+			if(newFeed.ques.likes){
+				likeCount = newFeed.ques.likes.length;
+			}
+			var feed = formatFeedContent(domain, title, text, challengee, challenger, dateTime, likeCount);
+			$('.feeds > .panel-group').prepend(feed);
+			$('.feed').css('marginBottom','5px');
+			$('.feed-controls').css('paddingLeft','10px');
+		}
+	}
+
+	function getUserFeeds(){
+		gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
+			if(!resp.code){
+				loadFeeds(resp.feeds);
+			}
+			else console.log(resp);
+		});
+	}
+
+	function getUserChallenges(){
+		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code){
+				userChallenges = resp.items;
+			}
+			else console.log(resp);
+		});	
+	}
+
+	function formatFeedContent(domain,title,text,challengee, challenger, dateTime,likeCount){
+		var feed = `
+		<div class="panel panel-default feed">
+			<div class="panel-heading feed-title">
+				<span class='question-title'>`+title+`</span>&nbsp;&nbsp;
+				|<a href='#'>
+					<span class='question-domain'>`+domain+`</span>
+				</a>&nbsp;&nbsp;
+				(<span>`+challengee+`</span>&nbsp;&nbsp;
+				<span class='glyphicon glyphicon-arrow-right'></span>
+				&nbsp;&nbsp;<span>`+challenger+`</span>)
+				<span class="pull-right date">`+dateTime+`</span>
+			</div>
+			<div class="panel-body">
+				<span class='question-content'>`+text+`</span>
+			</div>
+			<ul class='list-inline challenge-options'>
+				<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;(<span class='like-count'>`+likeCount+`</span>)</li>
+				<li title='Challenge' class='challenge-this'>
+					<span class='glyphicon glyphicon-share' data-toggle='modal' data-target='#challenger-modal'></span>&nbsp;(<span class='challenge-count'>0</span>)
+				</li>
+				<li title='Solve' class='solve'><span class='glyphicon glyphicon-edit'></span>&nbsp;(<span class='solve-count'>0</span>)</li>
+				<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
+			</ul>
+			<div class='panel-footer hide'>
+				<form action='javascript:void(0)' role='form' class='comment-section hide'>
+					<div class='form-group'>
+						<input type='text' class='form-control comment-text'>
+					</div>
+					<div class='form-group'>
+						<input type='submit' class='btn btn-primary btn-xs'>
+					</div>
+					<a href='#'>Show all comments</a>
+				</form>
+				<ul class='previous-comments hide'></ul>
+			</div>
+		</div>`;
+		return feed;
+	}
 
 	function loadChallengeFeeds(feedList){
 		clearFeed();
@@ -43,41 +136,7 @@ function loadEverything(){
 					likeCount = ques.likes.length;
 				if(ques.comments)
 					commentCount = ques.comments.length;
-				var feed = `<div class="panel panel-default feed">
-					<div class="panel-heading feed-title">
-						<span class='question-title'>`+ques.title+`&nbsp;&nbsp;</span>
-						|<a href='#'>
-							<span class='question-domain'>`+ques.domain+`</span>
-						</a>&nbsp;&nbsp;
-						(<span>`+challengee+`</span>&nbsp;&nbsp;
-						<span class='glyphicon glyphicon-arrow-right'></span>
-						&nbsp;&nbsp;<span>`+challenger+`</span>)
-						<span class="pull-right date">`+dateTime+`</span>
-					</div>
-					<div class="panel-body">
-						<span class='question-content'>`+ques.text+`</span>
-					</div>
-					<ul class='list-inline challenge-options'>
-						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;(<span class='like-count'>`+likeCount+`</span>)</li>
-						<li title='Challenge' class='challenge-this'>
-							<span class='glyphicon glyphicon-share' data-toggle='modal' data-target='#challenger-modal'></span>&nbsp;(<span class='challenge-count'>0</span>)
-						</li>
-						<li title='Solve' class='solve'><span class='glyphicon glyphicon-edit'></span>&nbsp;(<span class='solve-count'>0</span>)</li>
-						<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
-					</ul>
-					<div class='panel-footer hide'>
-						<form action='javascript:void(0)' role='form' class='comment-section hide'>
-							<div class='form-group'>
-								<input type='text' class='form-control comment-text'>
-							</div>
-							<div class='form-group'>
-								<input type='submit' class='btn btn-primary btn-xs'>
-							</div>
-							<a href='#'>Show all comments</a>
-						</form>
-						<ul class='previous-comments hide'></ul>
-					</div>
-				</div>`;
+				var feed = formatFeedContent(ques.domain, ques.title, ques.text, challengee, challenger, dateTime, likeCount);
 				$('.feeds > .panel-group').append(feed);
 				$('.feed').css('marginBottom','5px');
 				$('.feed-controls').css('paddingLeft','10px');
@@ -229,6 +288,7 @@ function loadEverything(){
 			question = $(selectedElement).parent().siblings('div');
 			qData.title = question.children('.question-title').text();
 			qData.text = question.children('.question-content').text();
+			qData.domain = question.children('a').children('.question-domain').text();
 			$('.selected-question > .question-title').text(qData.title);
 			$('.selected-question > .question-text').text(qData.text);
 		}
