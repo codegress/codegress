@@ -11,9 +11,9 @@
     <script src="../static/js/intersect.js"></script>
 	<div class="container">
 	    <div class="row">
-	    	<div class="col-xs-2">
-	    		<ul class="nav nav-sidebar text-center" style="border:1px solid #ddd;">
-	    			<li><a href="#" id="messages" class="tab-notify">Messages</a></li>
+	    	<div class="col-xs-2 text-center">
+	    		<ul class="nav nav-pills nav-stacked" style="border:1px solid #ddd;">
+	    			<li class="active"><a href="#" id="feeds" class="tab-notify">Feeds</a></li>
 	    			<li><a href="#" id="challenges" class="tab-notify">Challenges</a></li>
 	    			<li><a href="#" id="domains" class="tab-notify">Domains</a></li>
 	    		</ul>
@@ -28,6 +28,9 @@
 						<li><a href="#" data-toggle="tab" >Data Structures</a></li>
 					</ul>
 		    		<div class="panel-group"></div>
+		    		<div class="text-center">
+		    			<button class="btn btn-default btn-xs hide" id="load-more">Load More</button>
+		    		</div>
 		    		<div class="domain-questions"></div>
 		    	</div>
 		    	<div class="challenge-wrapper">
@@ -47,6 +50,8 @@
 	    		</div>
 	    	</div>
 	    </div>
+		
+		<!-- Challenger select modal -->
 	    <div id="challenger-modal" class="modal fade" role="dialog">
 		  <div class="modal-dialog">
 		    <div class="modal-content">
@@ -54,7 +59,7 @@
 		      	<label for="challenger-select"><h5>Select a challenger</h5></label>
 		      	<form action="" role="form" id="challenger-select-form">
 			        <div class="form-group has-feedback">
-					  <input type="search" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
+					  <input type="text" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
 					  <span class="glyphicon glyphicon-ok form-control-feedback hide"></span>
 				  	</div>
 			  	</form>
@@ -71,6 +76,7 @@
 	    	</div>
 		  </div>
 		</div>
+
 	</div>
 	<script>
       function init(){

@@ -105,7 +105,7 @@ $('#signin-form').submit(function(event){
                     else ipcRenderer.send('swap',{'url':'codegress.html'});
                 });
             }
-            else if(resp.code == 503){
+            else if(data.indexOf("username") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-email-group'));
                 invalidFeedback($('#signin-password-group'));
@@ -120,6 +120,7 @@ $('#signin-form').submit(function(event){
                     showForgotPassword();
                 }
             }
+            else console.log("Apocalypse");
         });
     }
     else setFeedbackText("All fields are required");
@@ -169,8 +170,6 @@ $('#pass-toggle').click(function(){
 // Check if text fields are empty and add appropriate glyphicons
 function emptyFormFields(form){
     var empty = false;
-    // clearStatus();
-    // hideForgotPassword();
     var formElements = form.children('div');
     formElements.each(function(){
         var inputElement = $(this).children('input');
@@ -215,16 +214,16 @@ function animateSignin(){
 }
 
 function animate(element){
-    element.animate({'margin-left':'20px'},40,function(){
-        $(this).animate({'margin-right':'20px'},40,function(){
+    element.animate({'margin-left':'32px'},35,function(){
+        $(this).animate({'margin-right':'32px'},35,function(){
             $(this).css({'margin':'auto'});
-            $(this).animate({'margin-left':'10px'},40,function(){
-                $(this).animate({'margin-right':'10px'},40,function(){
+            $(this).animate({'margin-left':'16px'},35,function(){
+                $(this).animate({'margin-right':'16px'},35,function(){
                     $(this).css({'margin':'auto'});
-                    $(this).animate({'margin-left':'5px'},40,function(){
-                        $(this).animate({'margin-right':'5px'},40,function(){
+                    $(this).animate({'margin-left':'8px'},35,function(){
+                        $(this).animate({'margin-right':'8px'},35,function(){
                             $(this).css({'margin':'auto'});
-                        })
+                        });
                     });
                 })
             });
