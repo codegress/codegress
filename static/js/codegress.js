@@ -42,6 +42,9 @@ function loadEverything(){
 		});
 	}
 
+
+	
+
 	function getChallengeFeeds(){
 		gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
 			if(!resp.code && resp.feeds){
@@ -265,16 +268,23 @@ function loadEverything(){
 		});
 	});
 
-	function loadChallenges(challengeList){
+function loadChallenges(challengeList){
+		
+		// $('.feeds').addClass('hide');
+		$('.challenge-list').html('');
+		$('.message-list').html('');
+		$('.challenges_accepted').removeClass('hide');
 		if(challengeList){
-			$('.challenge-list').html('');
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
+				console.log(challenge);
+				var lik=challenge.ques.likes.length;
+				if (challenge.rejected == false && challenge.accepted == false || challenge.rejected == null){
 				var listElement = `<li>
 					<div class='challenge'>
 						<ul class='list-inline'>
-							<li><a href='#' class='challenge-title'>`+challenge.ques.title+`</a></li>
-							<li><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
+							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'><b class='bold-domain'>{`+challenge.ques.domain+` }</b></span></li>
+							<li class="challengee-id"><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
 							<li class='pull-right'><a href='#' class='challenge-solve' title='Solve'>
 								<span class='glyphicon glyphicon-edit'></span>
 							</a></li>
@@ -283,16 +293,62 @@ function loadEverything(){
 							</a></li>
 						</ul>
 					</div>
-					<div class='challenge-content hide'>
-						<div class='question-title'>`
-						+challenge.ques.title+	
-						`</div>
+					<div class='challenge-content hide'>  
 						<div class='question-text'>`
 						+challenge.ques.text+	
 						`</div>
+						<ul class='list-inline challenge-options'>
+							<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;<span class='like-count'></span>`
+							+lik+
+							`</li> 
+							<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
+						</ul> 
+						<button type="submit" class="btn btn-primary btn-sm accept">Accept</button>
+						<button type="submit" class="btn btn-primary btn-sm swap reject">Reject</button>
 					</div>
 				</li>`;
+				
 				$('.challenge-list').append(listElement);
+				}
+			}
+			viewChallengContent();
+		}
+
+		$('.challenge_active').click(function(event){
+			loadChallenges(challengeList);
+			console.log('active hehe');
+		});
+		$('.challenge_accepted').click(function(event){
+			acceptedChallenges(challengeList)
+			console.log('accepted hehe');
+		});
+	}
+
+	function acceptedChallenges(challengeList) {
+
+		$('.challenges_accepted').removeClass('hide');
+		 $('.challenge-list').html('');
+		// $('.message-list').html('');
+		if(challengeList){
+			for(var i = 0;i < challengeList.length;i++){
+				var challenge = challengeList[i];
+				console.log(challenge);
+				var lik=challenge.ques.likes.length;
+				if (challenge.accepted == true){
+				var listElement = `<li>
+					<div class='challenge'>	 
+						<ul class='list-inline'>
+							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'><b class='bold-domain'>{`+challenge.ques.domain+` }</b></span></li>
+							<li class="challengee-id"><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
+							<li class='pull-right'><a href='#' class='challenge-solve' title='Solve'>
+								<span class='glyphicon glyphicon-edit'></span>
+							</a></li>
+						</ul>
+					</div>
+				</li>`;
+				
+				$('.challenge-list').append(listElement);
+				}
 			}
 			viewChallengContent();
 		}
@@ -530,6 +586,7 @@ function loadEverything(){
 			modify(data);
 			$('.reject').addClass('hide');
 			$('accept').addClass('hide');
+			$('.accept').parent().siblings('.challenge').children('.list-inline').addClass('hide');
 		});
 		$('.reject').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
