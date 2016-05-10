@@ -24,7 +24,7 @@ function initialiseAPI(apiRoot){
     gapi.client.load('codegress', 'v1', callback, apiRoot);
 };
 
-// swapping pages using IPC protocol
+// Swapping pages using IPC protocol
 $('.swap').click(function(event){
 	event.preventDefault();
 	var htmlPage = $(this).attr('href');
@@ -95,7 +95,6 @@ $('#signin-form').submit(function(event){
     var isEmpty = emptyFormFields($(this));
     const remoteSession = require('electron').remote.session;
     var session = remoteSession.fromPartition('persist:codegress');  
-    var signInElement = $('.signin');
     if(!isEmpty){
         disableSigninButton("Signing in...");
         gapi.client.codegress.user.validateAccount(dataToSend).execute(function(resp){
@@ -106,30 +105,30 @@ $('#signin-form').submit(function(event){
                     else ipcRenderer.send('swap',{'url':'codegress.html'});
                 });
             }
+            else if(data.indexOf("username") != -1){
+                enableSigninButton("Sign In");
+                invalidFeedback($('#signin-email-group'));
+                invalidFeedback($('#signin-password-group'));
+                setFeedbackText("Email / Username not registered yet.");
+            }
             else if(data.indexOf("password") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-password-group'));
-                setFeedbackText("Password didn't match",signInElement);
+                setFeedbackText("Password didn't match");
                 clearPasswordField();
                 if(++failedAttempts >= 2){
                     showForgotPassword();
                 }
             }
-            else{
-                enableSigninButton("Sign In");
-                invalidFeedback($('#signin-email-group'));
-                invalidFeedback($('#signin-password-group'));
-                setFeedbackText("Email / Username not registered yet.",signInElement);
-            }
+            else console.log("Apocalypse");
         });
     }
-    else setFeedbackText("All fields are required",signInElement);
+    else setFeedbackText("All fields are required");
 });
 
 $('#signup-form').submit(function(event){
     event.preventDefault();
     var isEmpty = emptyFormFields($(this));
-    var signUpElement = $('.signup');
     clearStatus();
     if(!isEmpty){
         gapi.client.codegress.user.createAccount(dataToSend).execute(function(resp){
@@ -138,35 +137,30 @@ $('#signup-form').submit(function(event){
                 hideSignupForm();
                 showSigninForm();
             }
-            else if(!resp.status && resp.data){
+            else if(!resp.status){
                 var data = resp.data;
-                if(data.indexOf("email") != -1 && data.indexOf("username") != -1){
+                if(data.indexOf("username") != -1){
                     invalidFeedback('#signup-username-group');
-                    invalidFeedback('#signup-email-group');
-                    setFeedbackText("Username & Email already taken",signUpElement);
+                    setFeedbackText("Username already taken");
                 }
-                else if(data.indexOf("username") != -1){
-                    invalidFeedback('#signup-username-group');
-                    setFeedbackText("Username already taken",signUpElement);
-                }
-                else if(data.indexOf("email") != -1){
+                if(data.indexOf("email") != -1){
                     invalidFeedback('#signup-email-group');
-                    setFeedbackText("Email already taken",signUpElement);
+                    setFeedbackText("Email already taken");
                 }
             }
+            else console.log(resp);
         });
     }
-    else setFeedbackText("All are required fields!",signUpElement);
+    else setFeedbackText("All are required fields!");
 });
 
 $('#recover-form').submit(function(event){
     event.preventDefault();
     var isEmpty = emptyFormFields($(this));
-    var recoverElement = $('.recover');
     if(!isEmpty){
         console.log('Recover email sent..');
     }
-    else setFeedbackText("Enter registered email", recoverElement);
+    else setFeedbackText("Enter registered email");
 });
 
 $('#pass-toggle').click(function(){
@@ -215,17 +209,21 @@ function clearStatus(){
     hideStatus();
 }
 
+function animateSignin(){
+    animate($('.signin'));
+}
+
 function animate(element){
-    element.animate({'margin-left':'20px'},40,function(){
-        $(this).animate({'margin-right':'20px'},40,function(){
+    element.animate({'margin-left':'32px'},35,function(){
+        $(this).animate({'margin-right':'32px'},35,function(){
             $(this).css({'margin':'auto'});
-            $(this).animate({'margin-left':'10px'},40,function(){
-                $(this).animate({'margin-right':'10px'},40,function(){
+            $(this).animate({'margin-left':'16px'},35,function(){
+                $(this).animate({'margin-right':'16px'},35,function(){
                     $(this).css({'margin':'auto'});
-                    $(this).animate({'margin-left':'5px'},40,function(){
-                        $(this).animate({'margin-right':'5gpx'},40,function(){
+                    $(this).animate({'margin-left':'8px'},35,function(){
+                        $(this).animate({'margin-right':'8px'},35,function(){
                             $(this).css({'margin':'auto'});
-                        })
+                        });
                     });
                 })
             });
@@ -234,9 +232,9 @@ function animate(element){
 }
 
 //Set status
-function setFeedbackText(status,element){
+function setFeedbackText(status){
     $('.status').html("<p>"+status+"</p>");
-    animate(element);
+    animateSignin();
     showStatus();
 }
 

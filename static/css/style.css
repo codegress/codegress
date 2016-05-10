@@ -69,7 +69,11 @@ hr{
 }
 
 .feed-body:hover{
-
+	
+}
+.date{
+	font-weight: normal;
+	font-size: 12px;
 }
 .domain-questions{
 	margin-top: 10px;
