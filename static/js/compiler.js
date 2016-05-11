@@ -1,22 +1,33 @@
-/* Code mirror editor instance */
+/* 
+    Code mirror editor instance 
+*/
 var editor = null;
 
+/* 
+    Loads endpoints API and creates editor 
+*/
 function actualInit(apiRoot){
   var apisToLoad;
-    var callback = function(){
-        if(--apisToLoad == 0){
-            enableEditor();
-        }
-    };
+  var callback = function(){
+      if(--apisToLoad == 0){
+          createEditor();
+      }
+  };
   apisToLoad = 1; 
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
 }  
 
+/* 
+  Shows hidden editor 
+*/
 function showEditor(){
   $('.inner-container').removeClass('hide'); 
 }
 
-function enableEditor(){
+/*
+  Creates codemirror editor on fly
+*/
+function createEditor(){
   showEditor();
   editor = CodeMirror.fromTextArea(
   document.getElementById('editor'), 
@@ -29,61 +40,91 @@ function enableEditor(){
 }
 
 function loadCompiler(){
+  
+  /* Importing required node modules */
   const electron = require('electron');
   const ipcRenderer = electron.ipcRenderer;
   const remoteSession = electron.remote.session;
   const fileSystem = require('fs');
   const childProcess = require('child_process').spawn;
+  var session = remoteSession.fromPartition('persist:codegress');
+
+  /* Required globals */
   var languageData = null, isCompiled = false, testCaseData = null, qDomain = null;
   var inputPipes = [], outputData = [], inputData = [];
   var testCaseResponse = {};  
-  var session = remoteSession.fromPartition('persist:codegress');
+  var timer = null;
+
+  /* Clearing localStorage on window load */
+  localStorage.clear();
+  localStorage.setItem('signed',true);
+
+  /* Requesting question data from main process */
   ipcRenderer.send('qdata',{});
   
+  /* Saving response of the main process */
   ipcRenderer.on('qdata',function(event,data){
     qDomain = data.domain;
     qTitle = data.title;
     qText = data.text;
-    displayQuestion(qTitle, qText);
-    getTestCaseData(qTitle);
+    displayQuestion();
+    getTestCaseData();
   });
 
-  function displayQuestion(qTitle, qText){
+  /* Displays question */
+  function displayQuestion(){
     $('#q-title').text(qTitle);
     $('#q-text').text(qText); 
   }
 
-  function getTestCaseData(qTitle){
+  /* Requesting test cases for current selected question */
+  function getTestCaseData(){
     gapi.client.codegress.testcase.getTestcase({'name':qTitle}).execute(function(response){
       if(!response.code){
         testCaseData = response.cases;
       }
-      console.log(response);
     });
   }    
 
-  /* Sets language data variable based on selected language */
+  /* Autosaving when the selected language is about to change*/
+  $("#select-lang").mousedown(function(){
+    if(editor.getValue()){
+        autoSave();
+      }
+  });
+
+  /* Requests background data based on selected language */
   $( "#select-lang" ).change(function() {
     hideAcknowledge();
     var selectedLang = getSelectedLanguage();
     var localData = getLocalData(selectedLang);
-    if(localData && localData.mode && localData.value){
-        editor.setOption('mode',localData.mode);
-        editor.setOption('value',localData.value);   
+
+    //Clear already existing timer and start a new one
+    // if(timer){
+    //   clearInterval(timer);
+    // }
+    // autoSaveTimer();
+
+    if(localData && localData.lang){
+      languageData = JSON.parse(localData.lang);
+        editor.setOption('mode',languageData.mode);
+        editor.setOption('value',languageData.placeholder);   
         enableCompileButton("Compile & Run");
     }
     else{
       disableCompileButton("Fetching Data...");
-      gapi.client.codegress.language.getLanguage({'name':selectedLang}).execute(function(response){
+      gapi.client.codegress.language.getLanguage({
+          'name':selectedLang
+        }).execute(function(response){
           if(!response.code){
             languageData = response.items[0];
             editor.setOption('mode',languageData.mode);
             editor.setOption('value',languageData.placeholder);
             localStorage.setItem(selectedLang,JSON.stringify(
               {
-                mode:languageData.mode,
-                value:languageData.placeholder
+                lang:JSON.stringify(languageData)
             }));
+            enableCompileButton("Compile & Run");
           }
           else console.log(response);
           console.log("From Datastore");
@@ -342,12 +383,7 @@ function loadCompiler(){
     // submitCode();
   }
 
-  function addTestCaseHandlers(){
-    
-  }
-
   function showAcknowledge(){
-    addTestCaseHandlers();
     $('.ack').removeClass('hide');
   }
 
@@ -448,7 +484,8 @@ function loadCompiler(){
         if(!hasCustomInput()){
           getPipesReady();
         }
-        
+
+        autoSave();
         compile(fileName);
       
       }
@@ -467,4 +504,39 @@ function loadCompiler(){
       $(".custom-input").addClass('hide');
     }
   });
+
+  function autoSave(){
+    var selectedLang = getSelectedLanguage();
+    var localData = getLocalData(selectedLang);
+    if(localData && localData.lang){
+      localData.lang = JSON.parse(localData.lang);
+      localData["lang"]["placeholder"] = editor.getValue();
+      localData.lang = JSON.stringify(localData["lang"]);
+      localData = JSON.stringify(localData);
+      localStorage.setItem(selectedLang, localData);
+    }
+  }
+
+  function autoSaveTimer(){
+    $('#auto-save-time').text(new Date());
+    var callback = function(){
+      var selectedLang = getSelectedLanguage();
+      var localData = getLocalData(selectedLang);
+      if(localData && localData.lang){
+        localData.lang = JSON.parse(localData.lang);
+        localData["lang"]["placeholder"] = editor.getValue();
+        localData.lang = JSON.stringify(localData["lang"]);
+        localData = JSON.stringify(localData);
+        localStorage.setItem(selectedLang, localData);
+      }
+      $('#auto-save-text').show(1000,function(){
+        $(this).text("AUTOSAVED");
+        $(this).attr('title',new Date());
+        $(this).fadeOut(10000,function(){})
+      });
+    };
+    callback();
+    timer = setInterval(callback, 5000);
+  }
+
 };

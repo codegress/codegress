@@ -39,6 +39,7 @@ function loadEverything(){
 				}
 				else $('.message-count').text('');
 			}
+			$('.message-count').removeClass('hide');
 		});
 	}
 
@@ -88,7 +89,7 @@ function loadEverything(){
 					</div>
 					<ul class='list-inline challenge-options'>
 						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up`;
-					if(cFeed.liked_by_user)
+					if(cFeed.liked_by_user && likeCount)
 						feed += ' text-primary';
 					feed += `'></span>&nbsp;(<span class='like-count'>`+likeCount+`</span>)</li>
 						<li title='Solve' class='solve'><span class='glyphicon glyphicon-edit'></span>&nbsp;(<span class='solve-count'>0</span>)</li>
