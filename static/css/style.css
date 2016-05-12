@@ -262,3 +262,11 @@ hr{
 .selected-question > .question-text{
 	margin-bottom: 10px;
 }
+.Psettings{
+	margin:auto;
+	box-shadow: 0.2px 0.5px 1.1px gray;
+	border-radius: 5px;
+	padding: 20px;	
+	background-color: white;
+	width: 25%;
+}

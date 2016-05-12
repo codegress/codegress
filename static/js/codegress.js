@@ -31,6 +31,7 @@ function loadEverything(){
 	});
 
 	function loadMessageCount(){
+		$('.challenges_accepted').addClass('hide');
 		gapi.client.codegress.message.getMessageRead({to:loggedUser, read:false}).execute(function(resp){
 			if(!resp.code){
 				if(resp.items){
@@ -42,7 +43,44 @@ function loadEverything(){
 		});
 	}
 
+		$('.challenge_active').click(function(event){
+			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code) {
+				clearFeed(); 
+				loadChallenges(resp.items);
+				console.log('challe');
+			}
+			else 
+				console.log(resp);
+			 
+			});
+		});
 
+
+		$('.challenge_accepted').click(function(event){
+			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code) {
+				clearFeed(); 
+				acceptedChallenges(resp.items);
+				console.log('accept');
+			}
+			else 
+				console.log(resp);
+			});
+			console.log('accepted hehe');
+		});
+		$('.challenge_rejected').click(function(event){
+			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code) {
+				clearFeed();
+				rejectedChallenges(resp.items);
+				console.log('rejected');
+			}
+			else 
+				console.log(resp);
+			});
+			console.log('accepted hehe');
+		});
 	
 
 	function getChallengeFeeds(){
@@ -314,14 +352,6 @@ function loadChallenges(challengeList){
 			viewChallengContent();
 		}
 
-		$('.challenge_active').click(function(event){
-			loadChallenges(challengeList);
-			console.log('active hehe');
-		});
-		$('.challenge_accepted').click(function(event){
-			acceptedChallenges(challengeList)
-			console.log('accepted hehe');
-		});
 	}
 
 	function acceptedChallenges(challengeList) {
@@ -354,6 +384,34 @@ function loadChallenges(challengeList){
 		}
 	}
 
+	function rejectedChallenges(challengeList) {
+
+		$('.challenges_accepted').removeClass('hide');
+		 $('.challenge-list').html('');
+		// $('.message-list').html('');
+		if(challengeList){
+			for(var i = 0;i < challengeList.length;i++){
+				var challenge = challengeList[i];
+				console.log(challenge);
+				var lik=challenge.ques.likes.length;
+				if (challenge.rejected == true){
+				var listElement = `<li>
+					<div class='challenge'>	 
+						<ul class='list-inline'>
+							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'><b class='bold-domain'>{`+challenge.ques.domain+` }</b></span></li>
+							<li class="challengee-id"><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
+						</ul>
+					</div>
+				</li>`;
+				
+				$('.challenge-list').append(listElement);
+				}
+			}
+			viewChallengContent();
+		}
+	}
+
+	
 	function addChallenge(challenger, challengee){
 		if(qData.title && qData.domain && challengee !== loggedUser){
 			var question = null;
@@ -437,6 +495,7 @@ function loadChallenges(challengeList){
 	});
 
 	function activateDomain(selectedDomain){
+		$('.challenges_accepted').addClass('hide');
 		var inactiveDomains = selectedDomain.siblings();
 		inactiveDomains.each(function(){
 			$(this).removeClass('active');
@@ -445,6 +504,7 @@ function loadChallenges(challengeList){
 	}
 
 	function loadSelectedDomain(questionsList){
+		$('.challenges_accepted').addClass('hide');
 		clearFeed();
 		if(questionsList != null){
 			for(var i = 0;i < questionsList.length;i++){
@@ -535,6 +595,7 @@ function loadChallenges(challengeList){
  	});
 
  	function loadMessages(messageList){
+ 		$('.challenges_accepted').addClass('hide');
 		console.log('Entered in loadMessages');
 		if(messageList){
 			console.log("middleeee");
@@ -566,7 +627,7 @@ function loadChallenges(challengeList){
 		$('.challenge-view').click(function(){
  			$(this).parent().parent().parent().siblings('.challenge-content').toggleClass('hide');
  			title = $(this).parent().siblings('.challenge-title-li').children('.challenge-title').text();
- 			UID = $(this).parent().siblings('.challengee-id').children('.challengee').text();
+ 			UID = $(this).parent().siblings('.challengee-id').children('a').text();
  			domain = $(this).parent().siblings('.challenge-title-li').children('.challenge-title').siblings('.ques-domain').children('.bold-domain').text();
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain :domain},seen:true};
 			modify(data);
@@ -576,6 +637,25 @@ function loadChallenges(challengeList){
 			gapi.client.codegress.challenge.modify(data).execute(function(resp){
 				if(!resp.code){
 					console.log(resp);
+			 
+				}
+				else console.log(resp.code);
+			});
+
+		}
+
+		function modifyAcceptReject(data){
+			gapi.client.codegress.challenge.modify(data).execute(function(resp){
+				if(!resp.code){
+					console.log(resp); 
+					gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+						if(!resp.code) {
+							clearFeed(); 
+							loadChallenges(resp.items);
+						}
+						else 
+							console.log(resp);
+					});
 				}
 				else console.log(resp.code);
 			});
@@ -583,16 +663,18 @@ function loadChallenges(challengeList){
 
 		$('.accept').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},accepted:true};
-			modify(data);
-			$('.reject').addClass('hide');
-			$('accept').addClass('hide');
-			$('.accept').parent().siblings('.challenge').children('.list-inline').addClass('hide');
+			var currentElement = $(this).parent('.challenge-content');
+			currentElement.siblings('.challenge').remove();
+			currentElement.remove();
+			modifyAcceptReject(data);
 		});
 		$('.reject').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
-			modify(data);
-			$('.accept').addClass('hide');
-			$('.reject').addClass('hide');
+			var currentElement = $(this).parent('.challenge-content');
+			currentElement.siblings('.challenge').remove();
+			currentElement.remove();
+			modifyAcceptReject(data); 
+			
 		});
 	}
 
