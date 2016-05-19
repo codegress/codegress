@@ -1,4 +1,3 @@
-const ipcRenderer = require('electron').ipcRenderer;
 function actualInit(apiRoot){
 	var apisToLoad;
     var callback = function(){
@@ -11,7 +10,6 @@ function actualInit(apiRoot){
 };
 
 function loadEverything(){
-	$('body').removeClass('hide');
 	const remoteSession = require('electron').remote.session;
 	var session = remoteSession.fromPartition('persist:codegress');
 	var loggedUser = null;
@@ -24,27 +22,44 @@ function loadEverything(){
 			loggedUser = cookies[0].value;
 			if(loggedUser){
 				getChallengeFeeds();
-				loadMessageCount();
+				getUnreadMessageCount();
+				getMessages();
+				getChallenges();
+				getFollowSuggestions();
+				showPage();
 			}
 		}
 		else ipcRenderer.send('swap',{url:'index.html'});
 	});
 
-	function loadMessageCount(){
+	function showPage(){
+		$('body').removeClass('hide');
+	}
+
+	function hideLoadingImage(){
+		$('#loading').addClass('hide');
+	}
+
+	function getFollowees(){
+		
+	}
+
+	function setFollowees(followeeList){
+
+	}
+
+	function getUnreadMessageCount(){
 		gapi.client.codegress.message.getMessageRead({to:loggedUser, read:false}).execute(function(resp){
 			if(!resp.code){
 				if(resp.items){
-					check = resp.items.length;
-					$('.message-count').text(check);
+					var messageCount = resp.items.length;
+					$('.message-count').text(messageCount);
 				}
 				else $('.message-count').text('');
 			}
 			$('.message-count').removeClass('hide');
 		});
 	}
-
-
-	
 
 	function getChallengeFeeds(){
 		gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
@@ -67,12 +82,17 @@ function loadEverything(){
 			for(;nextPageIndex < challengeFeeds.length && limit != 0;nextPageIndex++,limit--){
 				var challengee = challengeFeeds[nextPageIndex].challengee;
 				var challenger = challengeFeeds[nextPageIndex].challenger;
-				var dateTime = new Date(challengeFeeds[nextPageIndex].datetime);
+				var dateTime = new Date(challengeFeeds[nextPageIndex].datetime).toLocaleString();
 				var cFeed = challengeFeeds[nextPageIndex];
-				var likeCount = 0, commentCount = 0, likedByLoggedUser = false;
+				var likeCount = 0, commentCount = 0;
+				var likeTitle = "Like";
 				if(cFeed.likes){
 					var likes = cFeed.likes
 					likeCount = likes.length;
+					likeTitle = "";
+					for(var i = 0;i < likes.length;i++){
+						likeTitle += likes[i].username+"\n";
+					}
 				}
 				if(cFeed.comments)
 					commentCount = cFeed.comments.length;
@@ -85,13 +105,12 @@ function loadEverything(){
 						(<span class='challenger'>`+challenger+`</span>&nbsp;&nbsp;
 						<span class='glyphicon glyphicon-arrow-right'></span>
 						&nbsp;&nbsp;<span class='challengee'>`+challengee+`</span>)
-						<span class="pull-right date" style="font-style:italic;">`+dateTime+`</span>
 					</div>
 					<div class="panel-body">
 						<span class='question-content hide'>`+cFeed.ques.text+`</span><span class=''>`+cFeed.ques.text.split(/[.]/)[0]+`</span>..<a href='#' class='view'>read more</a>
 					</div>
 					<ul class='list-inline challenge-options'>
-						<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up`;
+						<li title='`+likeTitle+`' class='like'><span class='glyphicon glyphicon-thumbs-up`;
 					if(cFeed.liked_by_user && likeCount)
 						feed += ' text-primary';
 					feed += `'></span>&nbsp;(<span class='like-count'>`+likeCount+`</span>)</li>
@@ -100,6 +119,7 @@ function loadEverything(){
 							<span class='glyphicon glyphicon-share' data-toggle='modal' data-target='#challenger-modal'></span>&nbsp;(<span class='challenge-count'>0</span>)
 						</li>
 						<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
+						<li class='pull-right'><span class="date">`+dateTime+`</span></li>
 					</ul>
 					<div class='panel-footer hide'>
 						<form action='javascript:void(0)' role='form' class='comment-section hide'>
@@ -118,26 +138,97 @@ function loadEverything(){
 				$('.feed').css('marginBottom','5px');
 				$('.feed-controls').css('paddingLeft','10px');
 			}
-			eventHandlers();
+			feedEventHandlers();
 			if(nextPageIndex < challengeFeeds.length){
 				$('#load-more').removeClass('hide');
 			}
 			else{
 				$('#load-more').addClass('hide');	
 			}
+			hideLoadingImage();
 		}
 	}
 
-	function eventHandlers(){
-		
-		function selectedQuestionData(selectedElement){
-			question = $(selectedElement).parent().siblings('div');
-			qData.title = question.children('.question-title').text();
-			qData.text = question.children('.question-content').text();
-			qData.domain = question.children('a').children('.question-domain').text();
-			$('.selected-question > .question-title').text(qData.title);
-			$('.selected-question > .question-text').text(qData.text);
+	function selectedQuestionData(selectedElement){
+		var question = $(selectedElement).parent().siblings('div');
+		qData.title = question.children('.question-title').text();
+		qData.text = question.children('.question-content').text();
+		qData.domain = question.children('a').children('.question-domain').text();
+		$('.selected-question > .question-title').text(qData.title);
+		$('.selected-question > .question-text').text(qData.text);
+	}
+
+	function suggestChallengers(){
+		$('.challenger-suggestions').html('');
+		for(var i = 0;i < follows.length;i++){
+			var username = follows[i].username;
+			var listElement = `<li><input class='challenger' type='radio' name='select-challenger' id='`+username+`'>&nbsp;<label for='`+username+`'>`+username+`</label></li>`;
+			$('.challenger-suggestions').append(listElement);
 		}
+		suggestEventHandlers();
+	}
+
+	function suggestEventHandlers(){
+		$('.challenger').click(function(event){
+			var selectedElement = $(this)[0];
+			if(selectedElement){
+				$('#challenger-select').val(selectedElement.id);
+			}
+			else console.log(selectedElement);
+		});
+	}
+
+	function commonEventHandlers(){
+		$('.challenge-this').click(function(){
+			selectedQuestionData($(this));
+			suggestChallengers();
+		});
+
+		$('.solve').click(function(){
+			selectedQuestionData($(this));
+			if(qData.title && qData.text){
+				ipcRenderer.send('load',{url:'compiler.html',qData:qData});
+			}
+		});
+	}
+
+	function domainQuestionEventHandlers(){
+		
+		commonEventHandlers();
+
+		$('.challenge-options').click(function(){
+			var solve = $(this).children('.solve');
+			var challenge = $(this).children('.challenge-this');
+			$(this).siblings('.feed-body').toggle(function(){
+				if(solve.hasClass('hide') && challenge.hasClass('hide')){
+					solve.removeClass('hide');
+					challenge.removeClass('hide');
+				}
+				else{
+					solve.addClass('hide');
+					challenge.addClass('hide')	
+				}
+			});
+		});
+
+		$('.question').mouseenter(function(event){
+			$(this).children('.challenge-controls').removeClass('hide');
+		});
+
+		$('.question').mouseleave(function(event){
+			$(this).children('.challenge-controls').addClass('hide');
+		});
+
+		$('.view').click(function(event){
+			event.preventDefault();
+			var text = $(this).siblings('.question-content').text();
+			console.log(text);
+		});
+	}
+
+	function feedEventHandlers(){
+
+		commonEventHandlers();
 
 		$('.like').click(function(){
 			selectedQuestionData($(this));
@@ -175,72 +266,90 @@ function loadEverything(){
 					}
 				});
 			}
-		});
-
-		$('.challenge-this').click(function(){
-			selectedQuestionData($(this));
-		});
-
-		$('.solve').click(function(){
-			selectedQuestionData($(this));
-			if(qData.title && qData.text){
-				ipcRenderer.send('load',{url:'compiler.html',qData:qData});
-			}
-			else {
-				selectedQuestionDataOverriden($(this));
-				ipcRenderer.send('load',{url:'compiler.html',qData:qData});
-			}
 		});	
 		
 		$('.comment').click(function(){
 			$(this).parent().siblings('.panel-footer').children('.comment-section').toggleClass('hide');
 		});
 
-		$('.challenge-options').click(function(){
-			var solve = $(this).children('.solve');
-			var challenge = $(this).children('.challenge-this');
-			$(this).siblings('.feed-body').toggle(function(){
-				if(solve.hasClass('hide') && challenge.hasClass('hide')){
-					solve.removeClass('hide');
-					challenge.removeClass('hide');
-				}
-				else{
-					solve.addClass('hide');
-					challenge.addClass('hide')	
-				}
-			});
-		});
-
-		$('.question').mouseenter(function(event){
-			$(this).children('ul').removeClass('hide');
-		});
-
-		$('.question').mouseleave(function(event){
-			$(this).children('ul').addClass('hide');
-		});
-
 		$('#load-more').click(function(){
 			loadChallengeFeeds();
 		});
-
-		$('#feeds').click(function(){
-			getChallengeFeeds();
-		});
-
-		$('.view').click(function(event){
-			event.preventDefault();
-			var text = $(this).siblings('.question-content').text();
-			console.log(text);
-		});
 	}
 
-	$('#domains').click(function(event){
-		$('#domain-select').slideDown();
-	});
-
+	/* Focus on input field after challenger modal pops up */
 	$('#challenger-modal').on('shown.bs.modal', function () {
   		$('#challenger-select').focus();
 	});
+
+	$('#feeds').click(function(){
+		hideMainView($('.feeds'));
+		if($.trim($('.feeds > .panel-group').html().length)){
+			$('.feeds').removeClass('hide');
+		}
+		else{
+			getChallengeFeeds();
+			$('.feeds').removeClass('hide');
+		}
+	});
+
+	$('#messages').click(function(){
+		hideMainView($('.messages'));
+		if($.trim($('.message-list').html().length)){
+			$('.messages').removeClass('hide');
+			console.log("Messages");
+		}
+		else{
+			getMessages();
+			$('.messages').removeClass('hide');	
+		}
+	});
+
+	$('#challenges').click(function(){
+		hideMainView($('.challenges'));
+		if($.trim($('.challenge-list').html().length)){
+			$('.challenges').removeClass('hide');
+		}
+		else{
+			getChallenges();
+			$('.challenges').removeClass('hide');
+		}
+	});
+
+	$('#domains').click(function(){
+		hideMainView($('.domains'));
+		$('#domain-select').slideDown();
+		if($.trim($('.domain-questions').html().length)){
+			$('.domains').removeClass('hide');
+		}
+	});
+
+	function hideMainView(unhideElement){
+		$('.main-view').children('div').each(function(){
+			$(this).addClass('hide');
+		});
+		if(unhideElement)
+			unhideElement.removeClass('hide');
+	}
+
+	$('.sidebar > li').click(function(event){
+		var element = $(this).children('a').text().trim();
+		var sidebarList = {
+			"Feeds":{id:$('#feeds'),class:$('.feeds')},
+			"Messages":{id:$('#messages'),class:$('.messages')},
+			"Challenges":{id:$('#challenges'),class:$('.challenges')},
+			"Domains":{id:$('#domains'),class:$('.domains')}
+		};
+		var activeElement = sidebarList[element].id;
+		activateSidebarElement(activeElement);
+	});
+
+	function activateSidebarElement(activeElement){
+		$('.sidebar > li').each(function(){
+			$(this).removeClass('active');
+		});
+		activeElement.parent().addClass('active');
+	}
 
 	var qData = {}, shortListed = {};
 	$("#challenger-select").keyup(function(event){
@@ -258,28 +367,23 @@ function loadEverything(){
 		}
 	});
 
-	$('#challenges').click(function(event){
-		clearFeed();
+	/* Get challenges and format them on the page to display */
+	function getChallenges(){
 		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
 			if(!resp.code) {
 				loadChallenges(resp.items);
 			}
-			else 
-				console.log(resp);
+			else console.log(resp);
 		});
-	});
+	};
 
-function loadChallenges(challengeList){
-		
-		// $('.feeds').addClass('hide');
+	function loadChallenges(challengeList){
 		$('.challenge-list').html('');
-		$('.message-list').html('');
 		$('.challenges_accepted').removeClass('hide');
 		if(challengeList){
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
-				console.log(challenge);
-				var lik=challenge.ques.likes.length;
+				var likeCount = challenge.ques.likes.length;
 				if (challenge.rejected == false && challenge.accepted == false || challenge.rejected == null){
 				var listElement = `<li>
 					<div class='challenge'>
@@ -300,7 +404,7 @@ function loadChallenges(challengeList){
 						`</div>
 						<ul class='list-inline challenge-options'>
 							<li title='Like' class='like'><span class='glyphicon glyphicon-thumbs-up'></span>&nbsp;<span class='like-count'></span>`
-							+lik+
+							+likeCount+
 							`</li> 
 							<li title='Comment' class='comment'><span class='glyphicon glyphicon-option-horizontal'></span></li>
 						</ul> 
@@ -310,31 +414,28 @@ function loadChallenges(challengeList){
 				</li>`;
 				
 				$('.challenge-list').append(listElement);
-				}
 			}
+			$('.challenge-panel').removeClass('hide');
+		}
 			viewChallengContent();
 		}
 
 		$('.challenge_active').click(function(event){
 			loadChallenges(challengeList);
-			console.log('active hehe');
 		});
+		
 		$('.challenge_accepted').click(function(event){
-			acceptedChallenges(challengeList)
-			console.log('accepted hehe');
+			acceptedChallenges(challengeList);
 		});
 	}
 
 	function acceptedChallenges(challengeList) {
-
 		$('.challenges_accepted').removeClass('hide');
 		 $('.challenge-list').html('');
-		// $('.message-list').html('');
 		if(challengeList){
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
-				console.log(challenge);
-				var lik=challenge.ques.likes.length;
+				var likeCount=challenge.ques.likes.length;
 				if (challenge.accepted == true){
 				var listElement = `<li>
 					<div class='challenge'>	 
@@ -347,8 +448,7 @@ function loadChallenges(challengeList){
 						</ul>
 					</div>
 				</li>`;
-				
-				$('.challenge-list').append(listElement);
+					$('.challenge-list').append(listElement);
 				}
 			}
 			viewChallengContent();
@@ -356,7 +456,7 @@ function loadChallenges(challengeList){
 	}
 
 	function addChallenge(challenger, challengee){
-		if(qData.title && qData.domain && challengee !== loggedUser){
+		if(qData.title && qData.domain && challengee && challengee !== loggedUser){
 			var question = null;
 			gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques:{title:qData.title,domain:qData.domain,text:qData.text}}).execute(function(resp){
 				if(!resp.code){
@@ -377,49 +477,72 @@ function loadChallenges(challengeList){
 		return (shortListed && shortListed[0] === selectedChallenger && shortListed[0] !== loggedUser);
 	}
 
-	$('#customize-challenge').click(function(event){
+	$('#challenger-select-form').submit(function(event){
 		event.preventDefault();
-		console.log('Customize Challenge Page');
-	});
-
-	$('.challenge-btn').click(function(event){
-		event.preventDefault();
-		addChallenge(loggedUser, shortListed[0]);
+		if(shortListed){
+			addChallenge(loggedUser, shortListed[0]);
+		}
 	});
 
 	$('.discover-followers').click(function(event){
 		event.preventDefault();
-		gapi.client.codegress.user.getFollowSuggestions({name:loggedUser}).execute(function(resp){
-			if(!resp.code){
-				loadFollowSuggestions(resp.data);
-			}
-			console.log(resp);
-		});
+		hideMainView($('.follow-suggestions'));
 	});
 
+	var follows = {}
+	function getFollowSuggestions(){
+		var length = $.trim($('.follow-wrapper > ul').html().length);
+		if(length == 0){
+			var existingFollowerLength = $('.follower').length;
+			gapi.client.codegress.user.getFollowSuggestions({name:loggedUser}).execute(function(resp){
+				if(!resp.code){
+					var newFollowerLength = resp.items.length;
+					if(existingFollowerLength != newFollowerLength){
+						loadFollowSuggestions(resp.items);
+					}
+					follows = resp.items;
+				}
+			});
+		}
+	}
+
 	function loadFollowSuggestions(followList){
-		clearFeed();
 		if(followList){
-			$('.feeds').addClass('hide');
-			$('.challenge-wrapper').addClass('hide');
-			$('.follow-suggestions > ul').html('');
-			$('.follow-suggestions').removeClass('hide');
+			$('.follow-wrapper > ul').html('');
 			for(var i = 0;i < followList.length;i++){
-				var user = `<li class='follower'>
+				var follower = followList[i];
+				var formatedFollower = `<li class='follower row'>
 					<div class='profile-image'>
 						<img src="../static/images/codegress/default-handle-img.png">
 					</div>
-					<div class='username'>`+followList[i]+`</div>
-					<div class='follow-btn'><button class='btn btn-primary btn-xs'>Follow</button></div>
+					<div class='username'>`+follower.username+`</div>
+					<div class='follow-btn'>
+						<button class='btn btn-primary btn-xs'>Follow</button>
+					</div>
 				</li>`;
-				$('.follow-suggestions > ul').append(user);
-			}
+				$('.follow-wrapper > ul').append(formatedFollower);
+			} 
+			followEventHandlers();
 		}
+	}
+
+	function followEventHandlers(){
+		$('.follow-btn').click(function(event){
+			event.preventDefault();
+			var followButton = $(this).children('button');
+			if(followButton.attr('disabled')){
+				followButton.attr('disabled', false);
+				followButton.text("Follow");
+			}
+			else{ 
+				followButton.attr('disabled', true);
+				followButton.text("UnFollow");
+			}
+		});
 	}
 
 	$('#domain-select > li').click(function(event){
 		event.preventDefault();
-		clearFeed();
 		domain = $(this).children('a').text();
 		qData.domain = domain;
 		var questions = null;
@@ -431,9 +554,6 @@ function loadChallenges(challengeList){
 				}
 				else console.log('Response code : '+resp.code);
 			});
-		}
-		if($('.feeds').hasClass('hide')){
-			$('.feeds').removeClass('hide');
 		}
 	});
 
@@ -456,7 +576,7 @@ function loadChallenges(challengeList){
 				if(questionsList[i].likes){
 					likeCount = questionsList[i].likes.length;
 				}
-				var questionElement = `
+				var questionElement = `<li>
 					<div class="question">
 						<div class="panel-heading feed-title">
 							<span class='question-title'>`+title+`</span>&nbsp;&nbsp;
@@ -467,31 +587,23 @@ function loadChallenges(challengeList){
 						<div class="panel-body">
 							<span class='question-content'>`+text+`</span>
 						</div>
-						<ul class='list-inline hide' style='padding-left:10px;'>
-							<li class='solve' title='Solve'><span class='glyphicon glyphicon-edit'></span></li>
-							<li class='challenge-this' title='Challenge'><span class='glyphicon glyphicon-share' data-toggle='modal' data-target='#challenger-modal'></span></li>
-						</ul>
+						<div class='challenge-controls hide' style='padding-left:10px;'>
+							<span class='solve' title='Solve'><span class='glyphicon glyphicon-edit'></span></span>
+							<span class='challenge-this' title='Challenge'><span class='glyphicon glyphicon-share' data-toggle='modal' data-target='#challenger-modal'></span></span>
+						</div>
 					</div>
+					</li>
 				`;
-				$('.feeds > .domain-questions').append(questionElement);
+				$('.domain-questions').append(questionElement);
 				$('.feed').css('marginBottom','5px');
 				$('.feed-controls').css('paddingLeft','10px');
 			}
-			eventHandlers();
+			domainQuestionEventHandlers(); 
 		}
 	}
 
 	function clearFeed(){
-		$('.feeds > .domain-questions').html('');
-		$('.feeds > .panel-group').html('');
-		$('.follow-suggestions > ul').html('');
-		$('.challenge-wrapper > ol').html('');
-		$('.message-wrapper > ol').html('');
-	}
-
-	function hideFeed(){
-		$('.feeds > .domain-questions').addClass('hide');
-		$('.feeds > .panel-group').addClass('hide');
+		$('.domain-questions').html('');
 	}
 
 	$("#messages-select").keyup(function(event){
@@ -516,48 +628,33 @@ function loadChallenges(challengeList){
 	$('#send').click(function(event){
  		var to = $('#messages-select').val();
  		var message= $('#message-textarea').val();
- 		
  		gapi.client.codegress.message.send({message:message, to:to, frm:loggedUser}).execute(function(resp){
  			console.log(resp);
  		});
 
  	});
 
- 	$('#messages').click(function(event){
- 		clearFeed();
+ 	function getMessages(){
  		gapi.client.codegress.message.getMessageTo({to:loggedUser}).execute(function(resp){
  			if(!resp.code){
-	 			gapi.client.codegress.message.readTrue({to:loggedUser}).execute(function(resp){
-	 				$('.message-count').text('');
-	 			});
+	 			loadMessages(resp.items);	
 	 		}
-	 		loadMessages(resp.items);
+	 		else console.log(resp);
  		});
- 	});
+ 	}
 
  	function loadMessages(messageList){
-		console.log('Entered in loadMessages');
 		if(messageList){
-			console.log("middleeee");
 			for(var i=0; i<messageList.length;i++){
 				var date = new Date(messageList[i].datetime);
 				var dat = date.toLocaleString();
-				var list=`
-					<div class="form-group">
-						<li> `+messageList[i].message+` from `+messageList[i].frm+` at `+ dat +`</li>
-
-			      	</div>`;
-		 			
-					$('.message-list').append(list);
+				var list=`<li class='message'>
+						<div class='message-head'><a href='#'>`+messageList[i].frm+`</a></div>
+						<div class='message-body'>`+messageList[i].message+`</div>
+						<div class='message-date'>`+ dat +`</div>
+					</li>`;
+			    $('.message-list').append(list);
 			}
-		}
-		
-		else{
-			var elsList=
-			`<div>
-				Almost checked
-			</div>`;
-			$('.message-list').append(elsList);
 		}
 		 
 	}
@@ -567,10 +664,10 @@ function loadChallenges(challengeList){
 		$('.challenge-view').click(function(){
  			$(this).parent().parent().parent().siblings('.challenge-content').toggleClass('hide');
  			title = $(this).parent().siblings('.challenge-title-li').children('.challenge-title').text();
- 			UID = $(this).parent().siblings('.challengee-id').children('.challengee').text();
+ 			UID = $(this).parent().siblings('.challengee-id').children('a').text();
  			domain = $(this).parent().siblings('.challenge-title-li').children('.challenge-title').siblings('.ques-domain').children('.bold-domain').text();
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain :domain},seen:true};
-			modify(data);
+			console.log(data);
 		});
 
 		function modify(data){
@@ -585,15 +682,10 @@ function loadChallenges(challengeList){
 		$('.accept').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},accepted:true};
 			modify(data);
-			$('.reject').addClass('hide');
-			$('accept').addClass('hide');
-			$('.accept').parent().siblings('.challenge').children('.list-inline').addClass('hide');
 		});
 		$('.reject').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
 			modify(data);
-			$('.accept').addClass('hide');
-			$('.reject').addClass('hide');
 		});
 	}
 

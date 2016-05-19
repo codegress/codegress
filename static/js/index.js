@@ -1,4 +1,3 @@
-const ipcRenderer = require('electron').ipcRenderer;
 var dataToSend = {};   
 
 function enableForm(){ 

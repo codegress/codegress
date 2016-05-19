@@ -11,7 +11,7 @@ app.on('ready',function(){
 
     mainWindow = new BrowserWindow({
         width:size.width,
-        height:size.height
+        height:size.height 
     }); 
     
     mainWindow.loadURL('file://'+__dirname+'/templates/index.html');

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8"> 
-	<title>Custom Codegress</title> 
+	<title>Custom Codegress</title>  
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   	<link rel="stylesheet" href="../static/css/style.css">
   	<script>const $ = jQuery = require('../static/js/libs/jquery');</script>
@@ -12,50 +12,81 @@
 	<div class="container">
 	    <div class="row">
 	    	<div class="col-xs-2 text-center">
-	    		<ul class="nav nav-pills nav-stacked" style="border:1px solid #ddd;">
-	    			<li class="active"><a href="#" id="feeds" class="tab-notify">Feeds</a></li>
-	    			<li><a href="#" id="messages" class="tab-notify badgeCount">Messages <span class='badge label label-success message-count hide'> </span>	
-	    			<li><a href="#" id="challenges" class="tab-notify">Challenges</a></li>
-	    			<li><a href="#" id="domains" class="tab-notify">Domains</a></li>
+	    		<ul class="nav nav-pills nav-stacked sidebar">
+	    			<li class="active">
+	    				<a href="#" id="feeds" class="tab-notify">Feeds</a>
+	    			</li>
+	    			<li>
+	    				<a href="#" id="messages" class="tab-notify badgeCount">Messages
+	    				<span class='badge label label-success message-count hide'></span>
+	    				</a>
+	    			</li>	
+	    			<li>
+	    				<a href="#" id="challenges" class="tab-notify">Challenges</a>
+	    			</li>
+	    			<li>
+	    				<a href="#" id="domains" class="tab-notify">Domains</a>
+	    			</li>
 	    		</ul>
 	    	</div>
-	    	<div class="col-xs-7">  
+	    	<div class="col-xs-7 main-view">  
+				
 				<div class="feeds">
-					<ul class="nav nav-tabs" id='domain-select' style="display: none;">
-						<li><a href="#" data-toggle="tab">Strings</a></li>
-						<li><a href="#" data-toggle="tab" >Stacks</a></li>
-						<li><a href="#" data-toggle="tab" >Arrays</a></li>
-						<li><a href="#" data-toggle="tab" >Linked Lists</a></li>
-						<li><a href="#" data-toggle="tab" >Data Structures</a></li>
-					</ul>
+					<div align="center">
+					<img id="loading" src="../static/images/codegress/new-loading.gif" style="width:200px;margin-top:-50px;" />
+					</div>
 		    		<div class="panel-group"></div>
 		    		<div class="text-center">
 		    			<button class="btn btn-default btn-xs hide" id="load-more">Load More</button>
 		    		</div>
-		    		<div class="domain-questions"></div>
 		    	</div>
-				<div class="challenges_accepted hide">
-			    	<ul class="nav nav-tabs nav-justified">
-					  <li><a class="challenge_active form-control" href="#">Challenges</a></li>
-					  <li><a  class="challenge_accepted form-control" href="#">Accepted Challenges</a></li>
+		    	
+		    	<div class="domains hide">
+					<ul class="nav nav-tabs" id='domain-select' style="display: none;">
+						<li><a href="#" data-toggle="tab">Strings</a></li>
+						<li><a href="#" data-toggle="tab">Stacks</a></li>
+						<li><a href="#" data-toggle="tab">Arrays</a></li>
+						<li><a href="#" data-toggle="tab">Linked Lists</a></li>
+						<li><a href="#" data-toggle="tab">Data Structures</a></li>
 					</ul>
-				</div>
-		    	<div class="challenge-wrapper">
-		    		<ol class="challenge-list"></ol>
+					<div class="domain-wrapper">
+						<ol class="domain-questions"></ol>
+					</div>
 		    	</div>
-		    	<div class="message-wrapper">
-	    			<ol class="message-list"></ol>
-	    		</div>
-		    	<div class=" follow-suggestions">
-			    	<ul class="list-inline">
-			    		
-			    	</ul>
+				
+				<div class="challenges hide">
+			    	<ul class="nav nav-tabs nav-justified">
+						<li>
+						 	<a class="challenge_active form-control" href="#">Challenges</a>
+						</li>
+						<li>
+							<a  class="challenge_accepted form-control" href="#">Accepted Challenges</a>
+						</li>
+						<li>
+							<a  class="challenge_accepted form-control" href="#">Rejected Challenges</a>
+						</li>
+					</ul>
+					<div class="challenge-wrapper">
+		    			<ol class="challenge-list"></ol>
+		    		</div>
+				</div>
+				
+				<div class="messages hide">
+			    	<div class="message-wrapper">
+		    			<ol class="message-list"></ol>
+		    		</div>
+		    	</div>
+				
+				<div class="follow-suggestions hide">
+			    	<div class=" follow-wrapper">
+				    	<ul class="follow-list list-inline"></ul>
+				    </div>
 			    </div>
 	    	</div>
 	    	<div class="col-xs-3 graphs">
 	    		<div class="graphs">
-	    			<div>
-	    				<a href="#" class="discover-followers">Find people to follow</a>
+	    			<div class="discover-followers">
+	    				<a href="#" >Find people to follow</a>
 	    			</div>
 	    		</div>
 	    	</div>
@@ -84,21 +115,24 @@
 	    <div id="challenger-modal" class="modal fade" role="dialog">
 		  <div class="modal-dialog">
 		    <div class="modal-content">
+		    <div class="modal-header">
+		    	<label for="challenger-select"><h5>Select a challenger and press Enter</h5></label>
+		      	<form action="javascript:void(0)" id="challenger-select-form">
+			        <div class="form-group has-feedback">
+					  <input type="search" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
+					  <span class="glyphicon glyphicon-ok form-control-feedback hide"></span>
+				  	</div>
+				 </form>
+				 <ul class="challenger-suggestions list-inline"></ul>
+		    </div>
 		      <div class="modal-body">
-		      	<label for="challenger-select"><h5>Select a challenger</h5></label>
-		        <div class="form-group has-feedback">
-				  <input type="text" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
-				  <span class="glyphicon glyphicon-ok form-control-feedback hide"></span>
-			  	</div>
-			  	<hr>
 			  	<div class="selected-question">
 			  		<div class="question-title"></div>
 			  		<div class="question-text"></div>
 			  	</div>
-		  		<div class="modal-footer">
-			  		<button class="challenge-btn btn btn-primary btn-sm">Challenge</button>
-				  	<button class="cancel-btn btn btn-primary btn-sm" data-dismiss="modal">Cancel</button>
-				 </div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-primary btn-xs pull-right">Challenge</button>
 				</div>
 	    	</div>
 		  </div>

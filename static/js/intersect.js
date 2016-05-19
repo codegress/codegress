@@ -1,4 +1,6 @@
-const remoteSession = require('electron').remote.session;
+const electron = require('electron');
+const remoteSession = electron.remote.session;
+const ipcRenderer = electron.ipcRenderer;
 var session = remoteSession.fromPartition('persist:codegress'); 
 var navbar = `<div class='header'>
 	<nav class="navbar" role='navigation'> 

@@ -72,8 +72,13 @@ hr{
 	
 }
 .date{
-	font-weight: normal;
-	font-size: 12px;
+	font-size: 11px;
+}
+.sidebar{
+	border:1px solid #ddd;
+}
+.sidebar > li{
+	padding: 2px;
 }
 .domain-questions{
 	margin-top: 10px;
@@ -86,7 +91,13 @@ hr{
 	margin-bottom:10px;	
 }
 .question:hover{
-	box-shadow: 0px 1px 0.5px #aaa;
+	/*box-shadow: 0px 1px 0.5px #aaa;*/
+}
+.message{
+	/*box-shadow: 0px 1px 0.5px #aaa;*/
+	border: 1px solid #aaa;
+	padding: 10px;	
+	margin-bottom: 10px;
 }
 .challenge{
 	padding: 10px;
@@ -104,20 +115,9 @@ hr{
 .challenge-title .date{
 	font-size: 12px;
 }
-#new-challenge{
-	margin:auto;	
-}
-#new-challenge .form-group{
-	width: 65%;
-	margin-left:auto;
-	margin-right:auto;
-	margin-bottom: 15px;
-}
-#new-challenge .form-group #note{
-	color: gray;
-}
-#new-challenge .form-group > span{
-	
+.challeger-suggestions{
+	height: 100px;
+	overflow-y:scroll; 
 }
 #testcase-list li{
 	margin-left: 5px;

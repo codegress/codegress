@@ -6,12 +6,12 @@ var editor = null;
 /* 
     Loads endpoints API and creates editor 
 */
-function actualInit(apiRoot){
+function actualInit(apiRoot){  
   var apisToLoad;
   var callback = function(){
       if(--apisToLoad == 0){
           createEditor();
-      }
+      } 
   };
   apisToLoad = 1; 
   gapi.client.load('codegress', 'v1', callback, apiRoot); 
@@ -21,7 +21,7 @@ function actualInit(apiRoot){
   Shows hidden editor 
 */
 function showEditor(){
-  $('.inner-container').removeClass('hide'); 
+  $('body').removeClass('hide'); 
 }
 
 /*
@@ -79,14 +79,15 @@ function loadCompiler(){
 
   /* Requesting test cases for current selected question */
   function getTestCaseData(){
-    gapi.client.codegress.testcase.getTestcase({'name':qTitle}).execute(function(response){
+    gapi.client.codegress.question.getTestCases({'title':qTitle}).execute(function(response){
       if(!response.code){
-        testCaseData = response.cases;
+        testCaseData = response.items;
+        //newTestCase(testCaseData);
       }
     });
   }    
 
-  /* Autosaving when the selected language is about to change*/
+  /* Autosaving when the selected language is about to change */
   $("#select-lang").mousedown(function(){
     if(editor.getValue()){
         autoSave();
@@ -98,12 +99,6 @@ function loadCompiler(){
     hideAcknowledge();
     var selectedLang = getSelectedLanguage();
     var localData = getLocalData(selectedLang);
-
-    //Clear already existing timer and start a new one
-    // if(timer){
-    //   clearInterval(timer);
-    // }
-    // autoSaveTimer();
 
     if(localData && localData.lang){
       languageData = JSON.parse(localData.lang);
@@ -127,9 +122,8 @@ function loadCompiler(){
             enableCompileButton("Compile & Run");
           }
           else console.log(response);
-          console.log("From Datastore");
         });
-    }
+      }
   });
 
   function getLocalData(selectedLang){
@@ -154,19 +148,19 @@ function loadCompiler(){
     $('.ack').append(listElement);
   }
 
-  /*Display success testcase*/
+  /* Display success testcase */
   function success(headerText, bodyText){
       var listElement = createElement(headerText, bodyText, true);
       appendElement(listElement);
   }
 
-  /*Display error or failed testcase*/
+  /* Display error or failed testcase */
   function error(headerText, bodyText){
       var listElement = createElement(headerText, bodyText, false);
       appendElement(listElement);
   }
 
-  /*Creating new list element*/
+  /* Creating new list element */
   function createElement(headerText, bodyText, isSuccess){
     var listElement = document.createElement('li');
     var subList = document.createElement('ul');
@@ -209,7 +203,7 @@ function loadCompiler(){
     return listElement;
   }
 
-  /*Displaying the result..*/
+  /* Displaying the result.. */
   var testCasePassed = 0;
   function acknowledge(data, isError){
     data = escapeHTML(data);
@@ -226,7 +220,7 @@ function loadCompiler(){
     }
   }
 
-  /*Escapes HTML tags*/
+  /* Escapes HTML tags */
   function escapeHTML(unsafe) {
     return unsafe
          .replace(/&/g, "&amp;")
@@ -240,12 +234,12 @@ function loadCompiler(){
     $('.ack').html('');
   }
 
-  /*Interprets the code for python*/
+  /* Interprets the code for python */
   function pythonCompile(fileName, command){
     testCaseRunner(fileName, command);
   }
 
-  /*Compiles the code for java*/
+  /* Compiles the code for java */
   function javaCompile(fileName, command){
     
     processStart();
@@ -279,11 +273,12 @@ function loadCompiler(){
         acknowledge(err,true,"Syntax Error");
         processEnd();
       }
+      else console.log(code);
     });
   }
 
-  /*Runs the code against given test case input and acknowledges output*/
-  function genericRunner(fileName, command, inputPipe,actualOutput){
+  /* Runs the code against given test case input and acknowledges output */
+  function genericRunner(fileName, command, inputPipe, actualOutput){
     var out = "", err = "";
     if(!inputPipe) return;
     var genericProcess = childProcess(command, [fileName],{
@@ -319,11 +314,11 @@ function loadCompiler(){
         }
       }
       else acknowledge(out, false);
-      fileSystem.closeSync(inputPipe);
+      fileSystem.closeSync(inputPipe);  //closing inputPipe
     });
   }
 
-  /* Runs the code against pre-defined test cases*/
+  /* Runs the code against test cases */
   function testCaseRunner(fileName, command){
     index = 0;
     if(hasCustomInput()){
@@ -439,7 +434,7 @@ function loadCompiler(){
         var currentInputData = testCaseData[i].test_in;
         testCaseResponse[currentInputData] = false;
         var inputFile = "input"+(i+1)+".txt";
-        inputPipes[i] = getInputPipe(inputFile, currentInputData);
+        inputPipes[i] = getPipe(inputFile, currentInputData);
         inputData[i] = currentInputData;
         outputData[i] = testCaseData[i].test_out;
       }
@@ -447,9 +442,9 @@ function loadCompiler(){
   }
 
   /* Returns type of input pipe */
-  function getInputPipe(inputFile, inputData){
+  function getPipe(inputFile, inputData){
     var inputPipe = 'ignore';
-    if(inputFile){
+    if(inputFile && inputData){
       writeFile(inputFile, inputData);
       inputPipe = fileSystem.openSync(inputFile,'r');
     }
@@ -468,8 +463,23 @@ function loadCompiler(){
     if(hasCustomInput()){
       var inputFile = "input.txt";
       var customData = getCustomData();
-      return getInputPipe(inputFile, customData);
+      return getPipe(inputFile, customData);
     }
+  }
+
+  function newTestCase(){
+    var newInputPipe = 'ignore', newOutputPipe = 'ignore';
+    if(testCaseData != null){
+      var inputFile = "input.txt";
+      var outputFile = "actual_output.txt";
+      newInputPipe = getPipe(inputFile, testCaseData[0].test_in);
+      newOutputPipe = getPipe(outputFile, testCaseData[0].test_out);
+    }
+    else console.log("No Testcases Found");
+  }
+
+  function newTestCaseRunner(){
+
   }
 
   /* Compilation process starts here.. */
