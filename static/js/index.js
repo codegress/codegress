@@ -104,13 +104,13 @@ $('#signin-form').submit(function(event){
                     else ipcRenderer.send('swap',{'url':'codegress.html'});
                 });
             }
-            else if(data.indexOf("username") != -1){
+            else if(data && data.indexOf("username") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-email-group'));
                 invalidFeedback($('#signin-password-group'));
                 setFeedbackText("Email / Username not registered yet.");
             }
-            else if(data.indexOf("password") != -1){
+            else if(data && data.indexOf("password") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-password-group'));
                 setFeedbackText("Password didn't match");

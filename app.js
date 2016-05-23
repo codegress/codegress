@@ -25,8 +25,9 @@ app.on('ready',function(){
     var qData = null;
     ipcMain.on('load',function(event,data){
         qData = data.qData
-        if(qData != null)
+        if(qData){
             mainWindow.loadURL('file://'+__dirname+'/templates/'+data['url']); 
+        }
     });
 
     ipcMain.on('qdata',function(event, data){
