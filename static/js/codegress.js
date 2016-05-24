@@ -97,7 +97,6 @@ function loadEverything(){
 	}
 
 	function getUnreadMessageCount(){
-		$('.challenges').addClass('hide');
 		gapi.client.codegress.message.getMessageRead({to:loggedUser, read:false}).execute(function(resp){
 			if(!resp.code){
 				if(resp.items){
@@ -492,7 +491,6 @@ function loadEverything(){
 
 	function loadChallenges(challengeList){
 		$('.challenge-list').html('');
-		$('.challenges').removeClass('hide');
 		if(challengeList){
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
@@ -543,7 +541,6 @@ function loadEverything(){
 	}
 
 	function acceptedChallenges(challengeList) {
-		$('.challenges').removeClass('hide');
 		 $('.challenge-list').html('');
 		if(challengeList){
 			for(var i = 0;i < challengeList.length;i++){
@@ -569,8 +566,6 @@ function loadEverything(){
 	}
 
 	function rejectedChallenges(challengeList) {
-
-		$('.challenges').removeClass('hide');
 		 $('.challenge-list').html('');
 		// $('.message-list').html('');
 		if(challengeList){
