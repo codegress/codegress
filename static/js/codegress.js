@@ -49,6 +49,7 @@ function loadEverything(){
 	}
 
 	function getUnreadMessageCount(){
+		$('.challenges_accepted').addClass('hide');
 		gapi.client.codegress.message.getMessageRead({to:loggedUser, read:false}).execute(function(resp){
 			if(!resp.code){
 				if(resp.items){
@@ -56,11 +57,51 @@ function loadEverything(){
 					$('.message-count').text(messageCount);
 				}
 				else $('.message-count').text('');
-			}
+				}
 			$('.message-count').removeClass('hide');
-		});
-	}
+			});
+		}
 
+		$('.challenge_active').click(function(event){
+			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code) {
+				clearFeed(); 
+				loadChallenges(resp.items);
+				console.log('challe');
+			}
+			else 
+				console.log(resp);
+			 
+			});
+		});
+
+
+		$('.challenge_accepted').click(function(event){
+			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code) {
+				clearFeed(); 
+				acceptedChallenges(resp.items);
+				console.log('accept');
+			}
+			else 
+				console.log(resp);
+			});
+			console.log('accepted hehe');
+		});
+		
+		$('.challenge_rejected').click(function(event){
+			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+			if(!resp.code) {
+				clearFeed();
+				rejectedChallenges(resp.items);
+				console.log('rejected');
+			}
+			else 
+				console.log(resp);
+			});
+			console.log('accepted hehe');
+		});
+	
 	function getChallengeFeeds(){
 		gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
 			if(!resp.code && resp.feeds){
@@ -138,14 +179,14 @@ function loadEverything(){
 				$('.feed').css('marginBottom','5px');
 				$('.feed-controls').css('paddingLeft','10px');
 			}
-			feedEventHandlers();
-			if(nextPageIndex < challengeFeeds.length){
-				$('#load-more').removeClass('hide');
-			}
-			else{
-				$('#load-more').addClass('hide');	
-			}
-			hideLoadingImage();
+		feedEventHandlers();
+		if(nextPageIndex < challengeFeeds.length){
+			$('#load-more').removeClass('hide');
+		}
+		else{
+			$('#load-more').addClass('hide');	
+		}
+		hideLoadingImage();
 		}
 	}
 
@@ -455,6 +496,34 @@ function loadEverything(){
 		}
 	}
 
+	function rejectedChallenges(challengeList) {
+
+		$('.challenges_accepted').removeClass('hide');
+		 $('.challenge-list').html('');
+		// $('.message-list').html('');
+		if(challengeList){
+			for(var i = 0;i < challengeList.length;i++){
+				var challenge = challengeList[i];
+				console.log(challenge);
+				var lik=challenge.ques.likes.length;
+				if (challenge.rejected == true){
+				var listElement = `<li>
+					<div class='challenge'>	 
+						<ul class='list-inline'>
+							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'><b class='bold-domain'>{`+challenge.ques.domain+` }</b></span></li>
+							<li class="challengee-id"><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
+						</ul>
+					</div>
+				</li>`;
+				
+				$('.challenge-list').append(listElement);
+				}
+			}
+			viewChallengContent();
+		}
+	}
+
+	
 	function addChallenge(challenger, challengee){
 		if(qData.title && qData.domain && challengee && challengee !== loggedUser){
 			var question = null;
@@ -558,6 +627,7 @@ function loadEverything(){
 	});
 
 	function activateDomain(selectedDomain){
+		$('.challenges_accepted').addClass('hide');
 		var inactiveDomains = selectedDomain.siblings();
 		inactiveDomains.each(function(){
 			$(this).removeClass('active');
@@ -566,6 +636,7 @@ function loadEverything(){
 	}
 
 	function loadSelectedDomain(questionsList){
+		$('.challenges_accepted').addClass('hide');
 		clearFeed();
 		if(questionsList != null){
 			for(var i = 0;i < questionsList.length;i++){
@@ -644,6 +715,7 @@ function loadEverything(){
  	}
 
  	function loadMessages(messageList){
+ 		$('.challenges_accepted').addClass('hide');
 		if(messageList){
 			for(var i=0; i<messageList.length;i++){
 				var date = new Date(messageList[i].datetime);
@@ -674,6 +746,25 @@ function loadEverything(){
 			gapi.client.codegress.challenge.modify(data).execute(function(resp){
 				if(!resp.code){
 					console.log(resp);
+			 
+				}
+				else console.log(resp.code);
+			});
+
+		}
+
+		function modifyAcceptReject(data){
+			gapi.client.codegress.challenge.modify(data).execute(function(resp){
+				if(!resp.code){
+					console.log(resp); 
+					gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+						if(!resp.code) {
+							clearFeed(); 
+							loadChallenges(resp.items);
+						}
+						else 
+							console.log(resp);
+					});
 				}
 				else console.log(resp.code);
 			});
@@ -686,6 +777,17 @@ function loadEverything(){
 		$('.reject').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
 			modify(data);
+			var currentElement = $(this).parent('.challenge-content');
+			currentElement.siblings('.challenge').remove();
+			currentElement.remove();
+			modifyAcceptReject(data);
+		});
+		$('.reject').click(function(){
+			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
+			var currentElement = $(this).parent('.challenge-content');
+			currentElement.siblings('.challenge').remove();
+			currentElement.remove();
+			modifyAcceptReject(data); 			
 		});
 	}
 
