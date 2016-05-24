@@ -52,12 +52,18 @@ function loadCompiler(){
   /* Required globals */
   var languageData = null, isCompiled = false, testCaseData = null, qDomain = null;
   var inputPipes = [], outputData = [], inputData = [];
-  var testCaseResponse = {};  
-  var timer = null;
+  var testCaseResponse = {}, timer = null, loggedUser = null, numberOfPoints = 0;
 
   /* Clearing localStorage on window load */
   localStorage.clear();
   localStorage.setItem('signed',true);
+
+  session.cookies.get({name:'email'},function(error,cookies){
+        if(cookies.length > 0) {
+          loggedUser = cookies[0].value;
+        }
+        else console.log("User not logged");
+    });
 
   /* Requesting question data from main process */
   ipcRenderer.send('qdata',{});
@@ -66,7 +72,17 @@ function loadCompiler(){
   ipcRenderer.on('qdata',function(event,data){
     qDomain = data.domain;
     qTitle = data.title;
-    qText = data.text;
+    if(data.datetime){
+      gapi.client.codegress.getSubmission({username:loggedUser,datatime:data.datatime}).execute(function(){
+          if(!resp.code){
+            qText = resp.items[0].submission;
+          }
+          else console.log("No submission found");
+      });
+    }
+    else{
+      qText = data.text;
+    }
     displayQuestion();
     getTestCaseData();
   });
@@ -82,7 +98,6 @@ function loadCompiler(){
     gapi.client.codegress.question.getTestCases({'title':qTitle}).execute(function(response){
       if(!response.code){
         testCaseData = response.items;
-        //newTestCase(testCaseData);
       }
     });
   }    
@@ -217,6 +232,9 @@ function loadCompiler(){
         headerText = "Success ";
         success(headerText,formattedData);
         ++testCasePassed;
+        if(testCasePassed === testCaseData.length){
+          submitCode(testCasePassed);
+        }
     }
   }
 
@@ -320,7 +338,7 @@ function loadCompiler(){
 
   /* Runs the code against test cases */
   function testCaseRunner(fileName, command){
-    index = 0;
+    numberOfPoints = 0;
     if(hasCustomInput()){
       var inputPipe = getCustomPipe();
       genericRunner(fileName, command, inputPipe);
@@ -361,7 +379,7 @@ function loadCompiler(){
     return !hasError;
   }
   
-  /* Handling html elements behaviour during compilation*/
+  /* Handling html elements behaviour during compilation */
   function processStart(){  
     disableCompileButton("Processing..");
     $('#loading').css({'display':''});
@@ -369,13 +387,12 @@ function loadCompiler(){
     testCasePassed = 0;
   }
   
-  /* Handling html elements behaviour after compilation*/
+  /* Handling html elements behaviour after compilation */
   function processEnd(){
     enableCompileButton("Compile & Run");
     $('#loading').css({'display':'none'});
     showAcknowledge();
     scrollToBottom();
-    // submitCode();
   }
 
   function showAcknowledge(){
@@ -386,30 +403,20 @@ function loadCompiler(){
     $('.ack').addClass('hide');
   }
 
-  function submitCode(){
-    var user = null;
-    if(testCasePassed == testCaseData.length){
-      session.cookies.get({name:'email'},function(error,cookies){
-        if(cookies.length > 0) {
-          user = cookies[0].value;
+  function submitCode(testCasePassed){
+      gapi.client.codegress.challenge.addSubmission({
+      ques:{title:qTitle,domain:qDomain},
+      submission:editor.getValue(),
+      username:loggedUser,
+      language:getSelectedLanguage(),
+      points:parseFloat(testCasePassed/testCaseData.length)*100
+      }).execute(function(response){
+        if(!response.code){
+          console.log('Submission saved');
+          console.log(response);
         }
-      });
-    }
-    if(user != null){
-      gapi.client.codegress.submission.addSubmission(
-        {
-          ques_title:qTitle,
-          submission_text:editor.getValue(),
-          submitted_user:user
-        }
-          ).execute(function(response){
-          if(!response.code){
-            console.log('Submission saved');
-          }
-          else console.log(response);
-        });
-    }
-    else console.log('Cannot get submitted user');
+        else console.log(response);
+    });
   }
 
   function scrollToBottom(){

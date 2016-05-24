@@ -104,13 +104,13 @@ $('#signin-form').submit(function(event){
                     else ipcRenderer.send('swap',{'url':'codegress.html'});
                 });
             }
-            else if(data.indexOf("username") != -1){
+            else if(data && data.indexOf("username") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-email-group'));
                 invalidFeedback($('#signin-password-group'));
                 setFeedbackText("Email / Username not registered yet.");
             }
-            else if(data.indexOf("password") != -1){
+            else if(data && data.indexOf("password") != -1){
                 enableSigninButton("Sign In");
                 invalidFeedback($('#signin-password-group'));
                 setFeedbackText("Password didn't match");
@@ -131,20 +131,24 @@ $('#signup-form').submit(function(event){
     clearStatus();
     if(!isEmpty){
         gapi.client.codegress.user.createAccount(dataToSend).execute(function(resp){
-            if(!resp.code && resp.status){
-                localStorage.signed = true;
-                hideSignupForm();
-                showSigninForm();
-            }
-            else if(!resp.status){
-                var data = resp.data;
-                if(data.indexOf("username") != -1){
+            if(!resp.code){
+                if(resp.username === 'username' && resp.email === 'email'){
+                    invalidFeedback('#signup-username-group');
+                    invalidFeedback('#signup-email-group');
+                    setFeedbackText("Username & Email already taken");
+                }
+                else if(resp.username === 'username'){
                     invalidFeedback('#signup-username-group');
                     setFeedbackText("Username already taken");
                 }
-                if(data.indexOf("email") != -1){
+                else if(resp.email === 'email'){
                     invalidFeedback('#signup-email-group');
                     setFeedbackText("Email already taken");
+                }
+                else {
+                    localStorage.signed = true;
+                    hideSignupForm();
+                    showSigninForm();
                 }
             }
             else console.log(resp);
@@ -212,6 +216,10 @@ function animateSignin(){
     animate($('.signin'));
 }
 
+function animateSignUp(){
+    animate($('.signup'));   
+}
+
 function animate(element){
     element.animate({'margin-left':'32px'},35,function(){
         $(this).animate({'margin-right':'32px'},35,function(){
@@ -233,7 +241,10 @@ function animate(element){
 //Set status
 function setFeedbackText(status){
     $('.status').html("<p>"+status+"</p>");
-    animateSignin();
+    if(localStorage.signed){
+        animateSignin();
+    }
+    else animateSignUp();
     showStatus();
 }
 

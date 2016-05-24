@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8"> 
-	<title>Custom Codegress</title>  
+	<title>Codegress</title>  
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   	<link rel="stylesheet" href="../static/css/style.css">
   	<script>const $ = jQuery = require('../static/js/libs/jquery');</script>
@@ -20,13 +20,16 @@
 	    				<a href="#" id="messages" class="tab-notify badgeCount">Messages
 	    				<span class='badge label label-success message-count hide'></span>
 	    				</a>
-	    			</li>	
+	    			</li>
 	    			<li>
 	    				<a href="#" id="challenges" class="tab-notify">Challenges</a>
 	    			</li>
 	    			<li>
 	    				<a href="#" id="domains" class="tab-notify">Domains</a>
 	    			</li>
+	    			<li>
+	    				<a href="#" id="submissions" class="tab-notify">Submissions</a>
+	    			</li>	
 	    		</ul>
 	    	</div>
 	    	<div class="col-xs-7 main-view">  
@@ -76,11 +79,16 @@
 				    	<ul class="follow-list list-inline"></ul>
 				    </div>
 			    </div>
+				
+				<div class="submissions hide">
+					<ol class="submission-list"></ol>
+				</div>
+
 	    	</div>
 	    	<div class="col-xs-3 graphs">
 	    		<div class="graphs">
 	    			<div class="discover-followers">
-	    				<a href="#" >Find people to follow</a>
+	    				<a href="#" class="btn btn-primary btn-xs">Discover followers</a>
 	    			</div>
 	    		</div>
 	    	</div>
@@ -113,7 +121,7 @@
 		    	<label for="challenger-select"><h5>Select a challenger and press Enter</h5></label>
 		      	<form action="javascript:void(0)" id="challenger-select-form">
 			        <div class="form-group has-feedback">
-					  <input type="search" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
+					  <input type="text" class="form-control" id="challenger-select" placeholder="Search with Email or Username" autofocus>
 					  <span class="glyphicon glyphicon-ok form-control-feedback hide"></span>
 				  	</div>
 				 </form>
@@ -126,7 +134,7 @@
 			  	</div>
 				</div>
 				<div class="modal-footer">
-					<button class="btn btn-primary btn-xs pull-right">Challenge</button>
+					<button class="btn btn-primary btn-xs" id='challenge-btn'>Challenge</button>
 				</div>
 	    	</div>
 		  </div>

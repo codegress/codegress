@@ -1,4 +1,1 @@
-ABCD
-ABCD$DCBA
-A$B$C
-A@A@A
+A$B$C$D

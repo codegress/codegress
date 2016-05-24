@@ -12,22 +12,23 @@ function actualInit(apiRoot){
 function loadEverything(){
 	const remoteSession = require('electron').remote.session;
 	var session = remoteSession.fromPartition('persist:codegress');
-	var loggedUser = null;
-	var challengeFeeds = {};
-	var nextPageIndex = 0;
-	var loadLimit = 10;
+	var loggedUser = null, challengeFeeds = {}, nextPageIndex = 0, loadLimit = 10;
 
 	session.cookies.get({name:'email'},function(error,cookies){
 		if(cookies){
 			loggedUser = cookies[0].value;
-			if(loggedUser){
+			var googleAPI = gapi.client.codegress;
+			if(loggedUser && googleAPI){
 				getChallengeFeeds();
 				getUnreadMessageCount();
 				getMessages();
 				getChallenges();
 				getFollowSuggestions();
+				// getFollowees();
+				getSubmissions();
 				showPage();
 			}
+			else console.log("Unable to load Google API");
 		}
 		else ipcRenderer.send('swap',{url:'index.html'});
 	});
@@ -40,12 +41,59 @@ function loadEverything(){
 		$('#loading').addClass('hide');
 	}
 
-	function getFollowees(){
-		
+	function clearChallengerSuggestions(){
+		$('.challenger-suggestions').html('');
 	}
 
-	function setFollowees(followeeList){
+	function getFollowees(){
+		gapi.client.codegress.user.getFollowees({follower:loggedUser}).execute(function(resp){
+			if(!resp.code){
+				setFollowees(resp.items);
+			}
+			else console.log(resp.code);
+		});
+	}
 
+	function setFollowees(followList){
+		if(followList){
+			for(var i = 0;i < followList.length;i++){
+				follows.push(followList[i].followee);
+			}
+		}
+	}
+
+	function getSubmissions(){
+		gapi.client.codegress.challenge.getAllSubmissions({username:loggedUser}).execute(function(resp){
+			if(!resp.code)
+				loadSubmissions(resp.items);
+		});
+	}
+
+	function loadSubmissions(submissionList){
+		if(submissionList){
+			for(var index = 0;index < submissionList.length;index++){
+				var submission = submissionList[index];
+				var dateTime = new Date(submission.datetime).toLocaleString();
+				var subElement = `<li><div class='submission'>`;
+				subElement += `<a href='#' class='sub-title'>`+submission.ques.title+`</a>&nbsp;|&nbsp;`;
+				subElement += `<span class='sub-domain hide'>`+submission.ques.domain+`</span>`;
+				subElement += `<span class='date-time-python hide'>`+submission.datetime+`</span>`;
+				subElement += `<span class='date-time-js'>`+dateTime+`</span></div></li>`;
+				$('.submission-list').append(subElement);
+			}
+			submissionEventHandler();
+		}
+	}
+
+	function submissionEventHandler(){
+		$('.sub-title').click(function(event){
+			event.preventDefault();
+			var data = {}
+			data.title = $(this).text();
+			data.domain = $(this).siblings('.sub-domain').text();
+			data.datetime = $(this).siblings('.date-time-python').text();
+			ipcRenderer.send('load',{'qData':data,'url':'compiler.html'});
+		});
 	}
 
 	function getUnreadMessageCount(){
@@ -113,7 +161,10 @@ function loadEverything(){
 					loadChallengeFeeds();
 				}
 			}
-			else console.log(resp);
+			else {
+				hideLoadingImage();
+				$('.feeds').prepend("<p class='text-danger text-center'>No feeds to display..</p>");
+			}
 		});
 	}
 
@@ -199,14 +250,21 @@ function loadEverything(){
 		$('.selected-question > .question-text').text(qData.text);
 	}
 
-	function suggestChallengers(){
-		$('.challenger-suggestions').html('');
-		for(var i = 0;i < follows.length;i++){
-			var username = follows[i].username;
-			var listElement = `<li><input class='challenger' type='radio' name='select-challenger' id='`+username+`'>&nbsp;<label for='`+username+`'>`+username+`</label></li>`;
+	function suggestChallengers(startIndex, endIndex){
+		clearChallengerSuggestions();
+		if(startIndex >= 0 && endIndex >= 0){
+			for(var i = startIndex;i <= endIndex;i++){
+				var username = follows[i];
+				var listElement = `
+				<li><input class='challenger' type='radio' name='select-challenger' id='`+username+`'><label for='`+username+`'>`+username+`</label></li>`;
+				$('.challenger-suggestions').append(listElement);
+			}
+			suggestEventHandlers();
+		}
+		else{
+			var listElement = `<li class='text-center'><p class='text-danger'>No user found</p></li>`;
 			$('.challenger-suggestions').append(listElement);
 		}
-		suggestEventHandlers();
 	}
 
 	function suggestEventHandlers(){
@@ -222,7 +280,6 @@ function loadEverything(){
 	function commonEventHandlers(){
 		$('.challenge-this').click(function(){
 			selectedQuestionData($(this));
-			suggestChallengers();
 		});
 
 		$('.solve').click(function(){
@@ -270,7 +327,6 @@ function loadEverything(){
 	function feedEventHandlers(){
 
 		commonEventHandlers();
-
 		$('.like').click(function(){
 			selectedQuestionData($(this));
 			var likeButton = $(this).children('.glyphicon');
@@ -365,6 +421,13 @@ function loadEverything(){
 		}
 	});
 
+	$('#submissions').click(function(){
+		hideMainView($('.submissions'));
+		if($.trim($('.submission-list').html().length)){
+			$('.submissions').removeClass('hide');
+		}
+	});
+
 	function hideMainView(unhideElement){
 		$('.main-view').children('div').each(function(){
 			$(this).addClass('hide');
@@ -379,7 +442,8 @@ function loadEverything(){
 			"Feeds":{id:$('#feeds'),class:$('.feeds')},
 			"Messages":{id:$('#messages'),class:$('.messages')},
 			"Challenges":{id:$('#challenges'),class:$('.challenges')},
-			"Domains":{id:$('#domains'),class:$('.domains')}
+			"Domains":{id:$('#domains'),class:$('.domains')},
+			"Submissions":{id:$('#submissions'),class:$('.submissions')}
 		};
 		var activeElement = sidebarList[element].id;
 		activateSidebarElement(activeElement);
@@ -395,17 +459,25 @@ function loadEverything(){
 	var qData = {}, shortListed = {};
 	$("#challenger-select").keyup(function(event){
 		var selectedChallenger = $(this).val();
-		if(selectedChallenger && selectedChallenger.length >= 2){
-			var feedback = $(this).siblings('span')
-			if(isValidChallenger(selectedChallenger)){
-				feedback.parent().addClass('has-success');
-				feedback.removeClass('hide');
+		// console.log(follows);
+		if(selectedChallenger){
+			var startIndex = -1, endIndex = -1;
+			for(var i = 0;i < follows.length;i++){
+				var pattern = new RegExp(selectedChallenger);
+				var isFound = pattern.test(follows[i]);
+				if(isFound){
+					if(startIndex === -1)
+						startIndex = i; 
+					endIndex = i;
+				}
+				else if(startIndex !== -1 && endIndex !== -1){
+					break;
+				}
 			}
-			else{
-				feedback.parent().removeClass('has-success');
-				feedback.addClass('hide');
-			}
+			// console.log(startIndex+' - '+endIndex);
+			suggestChallengers(startIndex, endIndex);
 		}
+		else clearChallengerSuggestions();
 	});
 
 	/* Get challenges and format them on the page to display */
@@ -529,7 +601,11 @@ function loadEverything(){
 			var question = null;
 			gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques:{title:qData.title,domain:qData.domain,text:qData.text}}).execute(function(resp){
 				if(!resp.code){
-					console.log(resp);
+					if(resp.datetime){
+						alert("Successfully challenged "+challengee);
+						$('#challenger-modal').modal('hide');
+					}
+					else console.log("Cannot challenge");
 				}
 				else console.log(resp.code);
 			});
@@ -548,9 +624,12 @@ function loadEverything(){
 
 	$('#challenger-select-form').submit(function(event){
 		event.preventDefault();
-		if(shortListed){
-			addChallenge(loggedUser, shortListed[0]);
-		}
+	});
+
+	$('#challenge-btn').click(function(event){
+		event.preventDefault();
+		var challengee = $('#challenger-select').val();
+		addChallenge(loggedUser, challengee);
 	});
 
 	$('.discover-followers').click(function(event){
@@ -558,18 +637,20 @@ function loadEverything(){
 		hideMainView($('.follow-suggestions'));
 	});
 
-	var follows = {}
+	var follows = []
 	function getFollowSuggestions(){
 		var length = $.trim($('.follow-wrapper > ul').html().length);
 		if(length == 0){
 			var existingFollowerLength = $('.follower').length;
 			gapi.client.codegress.user.getFollowSuggestions({name:loggedUser}).execute(function(resp){
 				if(!resp.code){
-					var newFollowerLength = resp.items.length;
-					if(existingFollowerLength != newFollowerLength){
-						loadFollowSuggestions(resp.items);
+					if(resp.items){
+						var newFollowerLength = resp.items.length;
+						if(existingFollowerLength != newFollowerLength){
+							loadFollowSuggestions(resp.items);
+						}
+						console.log(resp.items);
 					}
-					follows = resp.items;
 				}
 			});
 		}
@@ -584,7 +665,7 @@ function loadEverything(){
 					<div class='profile-image'>
 						<img src="../static/images/codegress/default-handle-img.png">
 					</div>
-					<div class='username'>`+follower.username+`</div>
+					<div class='follow-username'>`+follower.username+`</div>
 					<div class='follow-btn'>
 						<button class='btn btn-primary btn-xs'>Follow</button>
 					</div>
@@ -599,14 +680,19 @@ function loadEverything(){
 		$('.follow-btn').click(function(event){
 			event.preventDefault();
 			var followButton = $(this).children('button');
-			if(followButton.attr('disabled')){
-				followButton.attr('disabled', false);
-				followButton.text("Follow");
-			}
-			else{ 
-				followButton.attr('disabled', true);
+			if(followButton.text() === 'Follow'){
 				followButton.text("UnFollow");
+				var followUsername = $(this).siblings('.follow-username').text();
+				var followee = {username:followUsername};
+				var follower = {username:loggedUser};
+				addFollowee(follower, followee);
 			}
+		});
+	}
+
+	function addFollowee(fwer, fwee){
+		gapi.client.codegress.user.follow({followee:fwee, follower:fwer}).execute(function(resp){
+			console.log(resp);
 		});
 	}
 
@@ -691,7 +777,7 @@ function loadEverything(){
 		event.preventDefault();
 		var challengerInput = $(this).children('div').children('input');
 		if(shortListed && shortListed.length == 1 && shortListed[0] != loggedUser){
-			console.log("nthng");		
+			console.log("Valid username :)")		
 		}	
 		else alert('Enter valid username');
 	});
