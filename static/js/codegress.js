@@ -97,7 +97,7 @@ function loadEverything(){
 	}
 
 	function getUnreadMessageCount(){
-		$('.challenges_accepted').addClass('hide');
+		$('.challenges').addClass('hide');
 		gapi.client.codegress.message.getMessageRead({to:loggedUser, read:false}).execute(function(resp){
 			if(!resp.code){
 				if(resp.items){
@@ -492,7 +492,7 @@ function loadEverything(){
 
 	function loadChallenges(challengeList){
 		$('.challenge-list').html('');
-		$('.challenges_accepted').removeClass('hide');
+		$('.challenges').removeClass('hide');
 		if(challengeList){
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
@@ -543,7 +543,7 @@ function loadEverything(){
 	}
 
 	function acceptedChallenges(challengeList) {
-		$('.challenges_accepted').removeClass('hide');
+		$('.challenges').removeClass('hide');
 		 $('.challenge-list').html('');
 		if(challengeList){
 			for(var i = 0;i < challengeList.length;i++){
@@ -570,7 +570,7 @@ function loadEverything(){
 
 	function rejectedChallenges(challengeList) {
 
-		$('.challenges_accepted').removeClass('hide');
+		$('.challenges').removeClass('hide');
 		 $('.challenge-list').html('');
 		// $('.message-list').html('');
 		if(challengeList){
@@ -713,7 +713,7 @@ function loadEverything(){
 	});
 
 	function activateDomain(selectedDomain){
-		$('.challenges_accepted').addClass('hide');
+		$('.challenges').addClass('hide');
 		var inactiveDomains = selectedDomain.siblings();
 		inactiveDomains.each(function(){
 			$(this).removeClass('active');
@@ -722,7 +722,7 @@ function loadEverything(){
 	}
 
 	function loadSelectedDomain(questionsList){
-		$('.challenges_accepted').addClass('hide');
+		$('.challenges').addClass('hide');
 		clearFeed();
 		if(questionsList != null){
 			for(var i = 0;i < questionsList.length;i++){
@@ -801,7 +801,7 @@ function loadEverything(){
  	}
 
  	function loadMessages(messageList){
- 		$('.challenges_accepted').addClass('hide');
+ 		$('.challenges').addClass('hide');
 		if(messageList){
 			for(var i=0; i<messageList.length;i++){
 				var date = new Date(messageList[i].datetime);
@@ -858,16 +858,12 @@ function loadEverything(){
 
 		$('.accept').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},accepted:true};
-			modify(data);
-		});
-		$('.reject').click(function(){
-			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
-			modify(data);
 			var currentElement = $(this).parent('.challenge-content');
 			currentElement.siblings('.challenge').remove();
 			currentElement.remove();
 			modifyAcceptReject(data);
 		});
+
 		$('.reject').click(function(){
 			var data = {challenger:UID,challengee:loggedUser,ques:{title:title, domain:domain},rejected:true};
 			var currentElement = $(this).parent('.challenge-content');
