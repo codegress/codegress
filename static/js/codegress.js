@@ -24,7 +24,7 @@ function loadEverything(){
 				getMessages();
 				getChallenges();
 				getFollowSuggestions();
-				getFollowees();
+				// getFollowees();
 				getSubmissions();
 				showPage();
 			}
@@ -120,7 +120,10 @@ function loadEverything(){
 					loadChallengeFeeds();
 				}
 			}
-			else console.log(resp);
+			else {
+				hideLoadingImage();
+				$('.feeds').prepend("<p class='text-danger text-center'>No feeds to display..</p>");
+			}
 		});
 	}
 
@@ -572,11 +575,13 @@ function loadEverything(){
 			var existingFollowerLength = $('.follower').length;
 			gapi.client.codegress.user.getFollowSuggestions({name:loggedUser}).execute(function(resp){
 				if(!resp.code){
-					var newFollowerLength = resp.items.length;
-					if(existingFollowerLength != newFollowerLength){
-						loadFollowSuggestions(resp.items);
+					if(resp.items){
+						var newFollowerLength = resp.items.length;
+						if(existingFollowerLength != newFollowerLength){
+							loadFollowSuggestions(resp.items);
+						}
+						console.log(resp.items);
 					}
-					console.log(resp.items);
 				}
 			});
 		}
@@ -591,7 +596,7 @@ function loadEverything(){
 					<div class='profile-image'>
 						<img src="../static/images/codegress/default-handle-img.png">
 					</div>
-					<div class='username'>`+follower.username+`</div>
+					<div class='follow-username'>`+follower.username+`</div>
 					<div class='follow-btn'>
 						<button class='btn btn-primary btn-xs'>Follow</button>
 					</div>
@@ -606,14 +611,19 @@ function loadEverything(){
 		$('.follow-btn').click(function(event){
 			event.preventDefault();
 			var followButton = $(this).children('button');
-			if(followButton.attr('disabled')){
-				followButton.attr('disabled', false);
-				followButton.text("Follow");
-			}
-			else{ 
-				followButton.attr('disabled', true);
+			if(followButton.text() === 'Follow'){
 				followButton.text("UnFollow");
+				var followUsername = $(this).siblings('.follow-username').text();
+				var followee = {username:followUsername};
+				var follower = {username:loggedUser};
+				addFollowee(follower, followee);
 			}
+		});
+	}
+
+	function addFollowee(fwer, fwee){
+		gapi.client.codegress.user.follow({followee:fwee, follower:fwer}).execute(function(resp){
+			console.log(resp);
 		});
 	}
 
