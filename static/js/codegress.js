@@ -107,47 +107,50 @@ function loadEverything(){
 				}
 			$('.message-count').removeClass('hide');
 			});
+	}
+
+	$('.challenge_active').click(function(event){
+		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+		if(!resp.code) {
+			clearFeed(); 
+			loadChallenges(resp.items);
+			console.log('challe');
 		}
-
-		$('.challenge_active').click(function(event){
-			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
-			if(!resp.code) {
-				clearFeed(); 
-				loadChallenges(resp.items);
-				console.log('challe');
-			}
-			else 
-				console.log(resp);
-			 
-			});
+		else 
+			console.log(resp);
+		 
 		});
+	});
 
 
-		$('.challenge_accepted').click(function(event){
-			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
-			if(!resp.code) {
-				clearFeed(); 
-				acceptedChallenges(resp.items);
-				console.log('accept');
-			}
-			else 
-				console.log(resp);
-			});
-			console.log('accepted hehe');
+	$('.challenge_accepted').click(function(event){
+		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+		if(!resp.code) {
+			clearFeed(); 
+			acceptedChallenges(resp.items);
+		}
+		else 
+			console.log(resp);
 		});
-		
-		$('.challenge_rejected').click(function(event){
-			gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
-			if(!resp.code) {
-				clearFeed();
-				rejectedChallenges(resp.items);
-				console.log('rejected');
-			}
-			else 
-				console.log(resp);
-			});
-			console.log('accepted hehe');
+	});
+	
+	$('.challenge_rejected').click(function(event){
+		gapi.client.codegress.challenge.getChallenges({challengee:loggedUser}).execute(function(resp){
+		if(!resp.code) {
+			clearFeed();
+			rejectedChallenges(resp.items);
+		}
+		else console.log(resp);
 		});
+	});
+
+	function showNoFeedMsg(){
+		$('.no-feeds').removeClass('hide');
+	}
+
+	function hideNoFeedMsg(){
+		$('.no-feeds').addClass('hide');
+	}
 	
 	function getChallengeFeeds(){
 		gapi.client.codegress.challenge.getChallengeFeeds({name:loggedUser}).execute(function(resp){
@@ -158,11 +161,14 @@ function loadEverything(){
 					challengeFeeds = resp.feeds;
 					clearFeed();
 					loadChallengeFeeds();
+					hideNoFeedMsg();
 				}
+				console.log(challengeFeedLength+' == '+respFeedLength);
 			}
 			else {
 				hideLoadingImage();
-				$('.feeds').prepend("<p class='text-danger text-center'>No feeds to display :(</p>");
+				$('.feeds > .panel-group').html('');
+				showNoFeedMsg();
 			}
 		});
 	}
@@ -242,7 +248,7 @@ function loadEverything(){
 		var question = $(selectedElement).parent().siblings('div');
 		qData.title = question.children('.question-title').text();
 		qData.text = question.children('.question-text').text();
-		qData.domain = question.children('a').children('.question-domain').text();
+		qData.domain = question.children('.question-domain').text();
 		$('.selected-question > .question-title').text(qData.title);
 		$('.selected-question > .question-text').text(qData.text);
 	}
@@ -387,9 +393,9 @@ function loadEverything(){
 			$('.feeds').removeClass('hide');
 		}
 		else{
-			getChallengeFeeds();
 			$('.feeds').removeClass('hide');
 		}
+		getChallengeFeeds();
 	});
 
 	$('#messages').click(function(){
@@ -399,9 +405,9 @@ function loadEverything(){
 			console.log("Messages");
 		}
 		else{
-			getMessages();
 			$('.messages').removeClass('hide');	
 		}
+		getMessages();
 	});
 
 	$('#challenges').click(function(){
@@ -410,9 +416,9 @@ function loadEverything(){
 			$('.challenges').removeClass('hide');
 		}
 		else{
-			getChallenges();
 			$('.challenges').removeClass('hide');
 		}
+		getChallenges();
 	});
 
 	$('#domains').click(function(){
@@ -439,15 +445,7 @@ function loadEverything(){
 	}
 
 	$('.sidebar > li').click(function(event){
-		var element = $(this).children('a').text().trim();
-		var sidebarList = {
-			"Feeds":{id:$('#feeds'),class:$('.feeds')},
-			"Messages":{id:$('#messages'),class:$('.messages')},
-			"Challenges":{id:$('#challenges'),class:$('.challenges')},
-			"Domains":{id:$('#domains'),class:$('.domains')},
-			"Submissions":{id:$('#submissions'),class:$('.submissions')}
-		};
-		var activeElement = sidebarList[element].id;
+		var activeElement = $(this).children('a').attr('id');
 		activateSidebarElement(activeElement);
 	});
 
@@ -455,7 +453,7 @@ function loadEverything(){
 		$('.sidebar > li').each(function(){
 			$(this).removeClass('active');
 		});
-		activeElement.parent().addClass('active');
+		$('#'+activeElement).parent().addClass('active');
 	}
 
 	var qData = {}, shortListed = {};
@@ -544,8 +542,8 @@ function loadEverything(){
 	}
 
 	function acceptedChallenges(challengeList) {
-		 $('.challenge-list').html('');
 		if(challengeList){
+			$('.challenge-list').html('');
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
 				var likeCount=challenge.ques.likes.length;
@@ -569,9 +567,8 @@ function loadEverything(){
 	}
 
 	function rejectedChallenges(challengeList) {
-		 $('.challenge-list').html('');
-		// $('.message-list').html('');
 		if(challengeList){
+			$('.challenge-list').html('');
 			for(var i = 0;i < challengeList.length;i++){
 				var challenge = challengeList[i];
 				console.log(challenge);
@@ -600,10 +597,10 @@ function loadEverything(){
 			gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques:{title:qData.title,domain:qData.domain,text:qData.text}}).execute(function(resp){
 				if(!resp.code){
 					if(resp.datetime){
-						alert("Successfully challenged "+challengee);
+						alert("Challenge success :)");
 						$('#challenger-modal').modal('hide');
 					}
-					else console.log("Cannot challenge");
+					else console.log(resp);
 				}
 				else console.log(resp.code);
 			});
@@ -797,12 +794,11 @@ function loadEverything(){
  			if(!resp.code){
 	 			loadMessages(resp.items);	
 	 		}
-	 		else console.log(resp);
  		});
  	}
 
  	function loadMessages(messageList){
- 		$('.challenges').addClass('hide');
+ 		$('.message-list').html('');
 		if(messageList){
 			for(var i=0; i<messageList.length;i++){
 				var date = new Date(messageList[i].datetime);

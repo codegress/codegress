@@ -28,7 +28,6 @@ function showEditor(){
   Creates codemirror editor on fly
 */
 function createEditor(){
-  showEditor();
   editor = CodeMirror.fromTextArea(
   document.getElementById('editor'), 
   {
@@ -53,39 +52,53 @@ function loadCompiler(){
   var languageData = null, isCompiled = false, testCaseData = null, qDomain = null;
   var inputPipes = [], outputData = [], inputData = [];
   var testCaseResponse = {}, timer = null, loggedUser = null, numberOfPoints = 0;
+  var qDomain = null, qTitle = null, qText = null;
 
   /* Clearing localStorage on window load */
   localStorage.clear();
   localStorage.setItem('signed',true);
 
   session.cookies.get({name:'email'},function(error,cookies){
-        if(cookies.length > 0) {
-          loggedUser = cookies[0].value;
-        }
-        else console.log("User not logged");
-    });
+      if(cookies.length > 0) {
+        loggedUser = cookies[0].value;
+      }
+      else console.log("User not logged");
+  });
 
   /* Requesting question data from main process */
   ipcRenderer.send('qdata',{});
   
   /* Saving response of the main process */
-  ipcRenderer.on('qdata',function(event,data){
+  ipcRenderer.on('qdata',function(event, data){
     qDomain = data.domain;
     qTitle = data.title;
     if(data.datetime){
-      gapi.client.codegress.getSubmission({username:loggedUser,datatime:data.datatime}).execute(function(){
-          if(!resp.code){
-            qText = resp.items[0].submission;
+      gapi.client.codegress.challenge.getSubmission({username:loggedUser, datetime:data.datetime}).execute(function(resp){
+          if(!resp.code && resp.items){
+            loadSubmission(resp.items[0]);
           }
-          else console.log("No submission found");
+          showEditor();
       });
     }
-    else{
-      qText = data.text;
-    }
+    else qText = data.text;
+  });
+
+  function loadSubmission(submissionData){
+    var lang = submissionData.language;
+    qText = submissionData.ques.text;
+    var langData = null;
+    gapi.client.codegress.language.getLanguage({name:lang}).execute(function(resp){
+      if(!resp.code && resp.items){
+        langData = resp.items[0];
+        $('#select-lang').val(lang);
+        editor.setOption('mode',langData.mode);
+        editor.setOption('value',submissionData.submission);
+        enableCompileButton("Compile & Run");   
+      }
+    });
     displayQuestion();
     getTestCaseData();
-  });
+  }
 
   /* Displays question */
   function displayQuestion(){
