@@ -162,6 +162,8 @@ $('#recover-form').submit(function(event){
     var isEmpty = emptyFormFields($(this));
     if(!isEmpty){
         console.log('Recover email sent..');
+        hideRecoverForm();
+        showSigninForm();
     }
     else setFeedbackText("Enter registered email");
 });

@@ -1,4 +1,3 @@
-const ipcRenderer = require('electron').ipcRenderer;
 function actualInit(apiRoot){
 	var apisToLoad;
     var callback = function(){
@@ -39,15 +38,10 @@ function loadEverything(){
 			var country=$('.country').val();
 			gapi.client.codegress.user.setPersonalSetting({username:loggedUser, fullname:fullname, email:email, country: country}).execute(function(resp){
 				console.log(resp);
-				if(resp.status==true)
-						alert("Changes Done ! Sucess ");
+				if(resp.status)
+					alert("Changes Done ! Sucess ");
 				else
 					alert("Stop naughty things");
-				
-				$('.fullname').val("");
-				$('.email').val("");
-				$('.country').val("");
-
 			});
 		});
 	});

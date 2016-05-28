@@ -1,46 +1,70 @@
-import java.io.*;
+import java.util.*;
 public class random{
-	public static void main(String[] args) throws Exception{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		char input[] = br.readLine().toCharArray();
-		int size = input.length;
-		for(int i = 0, j = size-1; i < size/2 && i != j;){
-			char firstChar = input[i];
-			char lastChar = input[j];
-			if(isAlphabet(firstChar) && isAlphabet(lastChar)){
-				input = swap(input, i, j);
-				i++;j--;
-			}
-			else if(isAlphabet(firstChar)){
-				j--;
-			}
-			else if(isAlphabet(lastChar)){
-				i++;
-			}
-			else{
-				i++;j--;
-			}
+	static int[] array;
+	static int size;
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		size = Integer.parseInt(scan.nextLine());
+		
+		array = new int[size];
+		Arrays.fill(array,-1);
+		
+		random prob = new random();
+		String input[] = scan.nextLine().split(",");
+		for(int i = 0;i < input.length;i++){
+			prob.insert(Integer.parseInt(input[i]));
 		}
-		System.out.print(input);
+		prob.displayHash();
+		scan.close();
 	}
 
-	private static boolean isAlphabet(char ch){
-		if((int)ch >= 64 && (int)ch <= 91){
-			return true;
+	public void insert(int value){
+		int key = getHashedIndex(value);
+		if(array[key] == -1){
+			array[key] = value;
 		}
-		else if((int)ch >= 96 && (int)ch <= 122){
-			return true;
+		else{
+			int loopCount = 0;
+			for(int i = key+1;i < size;i++){
+				if(array[i] == -1){
+					array[i] = value;
+					break;
+				}
+				if(++loopCount == size) break;
+				if(i == size-1) i = -1;
+			}
 		}
-		else return false;
+	}
+	
+	public void remove(int value){
+		int key = getHashedIndex(value);
+		if(array[key] == value){
+			array[key] = -1;
+		}
+		else{
+			int loopCount = 0;
+			for(int i = key+1;i < size;i++){
+				if(array[i] == value){
+					array[i] = -1;
+					break;
+				}
+				if(++loopCount == size) break;
+				if(i == size-1) i = -1;
+			}
+		}
 	}
 
-	private static char[] swap(char input[], int startIndex, int endIndex){
-		if(startIndex >= 0 && endIndex < input.length){
-			char firstChar = input[startIndex];
-			char lastChar = input[endIndex];
-			input[startIndex] = lastChar;
-			input[endIndex] = firstChar;
+	public int getHashedIndex(int value){
+		return value%size;
+	}
+
+	public void displayHash(){
+		for(int i = 0;i < size;i++){
+          	if(i  != size-1)
+				System.out.print(array[i]+",");
+          	else 
+              	System.out.print(array[i]);
 		}
-		return input;
+		System.out.println();
 	}
 }

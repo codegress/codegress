@@ -16,7 +16,7 @@ function loadEverything(){
 
 	session.cookies.get({name:'email'},function(error,cookies){
 		if(cookies){
-			loggedUser = cookies[0].value;
+			loggedUser = cookies[0].value; 
 			var googleAPI = gapi.client.codegress;
 			if(loggedUser && googleAPI){
 				getChallengeFeeds();
@@ -24,7 +24,7 @@ function loadEverything(){
 				getMessages();
 				getChallenges();
 				getFollowSuggestions();
-				// getFollowees();
+				getFollowees();
 				getSubmissions();
 				showPage();
 			}
@@ -46,7 +46,7 @@ function loadEverything(){
 	}
 
 	function getFollowees(){
-		gapi.client.codegress.user.getFollowees({follower:loggedUser}).execute(function(resp){
+		gapi.client.codegress.user.getFollowees({name:loggedUser}).execute(function(resp){
 			if(!resp.code){
 				setFollowees(resp.items);
 			}
@@ -57,7 +57,7 @@ function loadEverything(){
 	function setFollowees(followList){
 		if(followList){
 			for(var i = 0;i < followList.length;i++){
-				follows.push(followList[i].followee);
+				follows.push(followList[i].username);
 			}
 		}
 	}
@@ -162,7 +162,7 @@ function loadEverything(){
 			}
 			else {
 				hideLoadingImage();
-				$('.feeds').prepend("<p class='text-danger text-center'>No feeds to display..</p>");
+				$('.feeds').prepend("<p class='text-danger text-center'>No feeds to display :(</p>");
 			}
 		});
 	}
@@ -190,15 +190,13 @@ function loadEverything(){
 				var feed = `<div class="panel panel-default feed">
 					<div class="panel-heading feed-title">
 						<span class='question-title'>`+cFeed.ques.title+`</span>&nbsp;&nbsp;
-						|<a href='#'>
-							<span class='question-domain'>`+cFeed.ques.domain+`</span>
-						</a>&nbsp;&nbsp;
+						|&nbsp;&nbsp;<span class='question-domain'>`+cFeed.ques.domain+`</span>&nbsp;&nbsp;
 						(<span class='challenger'>`+challenger+`</span>&nbsp;&nbsp;
 						<span class='glyphicon glyphicon-arrow-right'></span>
 						&nbsp;&nbsp;<span class='challengee'>`+challengee+`</span>)
 					</div>
 					<div class="panel-body">
-						<span class='question-content hide'>`+cFeed.ques.text+`</span><span class=''>`+cFeed.ques.text.split(/[.]/)[0]+`</span>..<a href='#' class='view'>read more</a>
+						<span class='question-text hide'>`+cFeed.ques.text+`</span><span class=''>`+cFeed.ques.text.split(/[.]/)[0]+`</span>..<a href='#' class='view' data-toggle='modal' data-target='#question-modal'>read more</a>
 					</div>
 					<ul class='list-inline challenge-options'>
 						<li title='`+likeTitle+`' class='like'><span class='glyphicon glyphicon-thumbs-up`;
@@ -243,7 +241,7 @@ function loadEverything(){
 	function selectedQuestionData(selectedElement){
 		var question = $(selectedElement).parent().siblings('div');
 		qData.title = question.children('.question-title').text();
-		qData.text = question.children('.question-content').text();
+		qData.text = question.children('.question-text').text();
 		qData.domain = question.children('a').children('.question-domain').text();
 		$('.selected-question > .question-title').text(qData.title);
 		$('.selected-question > .question-text').text(qData.text);
@@ -287,6 +285,17 @@ function loadEverything(){
 				ipcRenderer.send('load',{url:'compiler.html',qData:qData});
 			}
 		});
+
+		$('.view').click(function(event){
+			event.preventDefault();
+			var feed = $(this).parent().siblings('.feed-title');
+			var domain = feed.children('.question-domain').text();
+			var title = feed.children('.question-title').text();
+			var text = $(this).siblings('.question-text').text();
+			$('.view-domain').html(domain);
+			$('.view-title').html(title);
+			$('.view-text').html(text);
+		});
 	}
 
 	function domainQuestionEventHandlers(){
@@ -314,12 +323,6 @@ function loadEverything(){
 
 		$('.question').mouseleave(function(event){
 			$(this).children('.challenge-controls').addClass('hide');
-		});
-
-		$('.view').click(function(event){
-			event.preventDefault();
-			var text = $(this).siblings('.question-content').text();
-			console.log(text);
 		});
 	}
 
@@ -458,11 +461,12 @@ function loadEverything(){
 	var qData = {}, shortListed = {};
 	$("#challenger-select").keyup(function(event){
 		var selectedChallenger = $(this).val();
-		// console.log(follows);
+		console.log(follows);
 		if(selectedChallenger){
 			var startIndex = -1, endIndex = -1;
 			for(var i = 0;i < follows.length;i++){
-				var pattern = new RegExp(selectedChallenger);
+				var regex = "^"+selectedChallenger;
+				var pattern = new RegExp(regex);
 				var isFound = pattern.test(follows[i]);
 				if(isFound){
 					if(startIndex === -1)
@@ -473,7 +477,6 @@ function loadEverything(){
 					break;
 				}
 			}
-			// console.log(startIndex+' - '+endIndex);
 			suggestChallengers(startIndex, endIndex);
 		}
 		else clearChallengerSuggestions();
@@ -638,15 +641,16 @@ function loadEverything(){
 		if(length == 0){
 			var existingFollowerLength = $('.follower').length;
 			gapi.client.codegress.user.getFollowSuggestions({name:loggedUser}).execute(function(resp){
-				if(!resp.code){
-					if(resp.items){
-						var newFollowerLength = resp.items.length;
-						if(existingFollowerLength != newFollowerLength){
-							loadFollowSuggestions(resp.items);
-						}
-						console.log(resp.items);
+				if(!resp.code && resp.items){
+					var newFollowerLength = resp.items.length;
+					if(existingFollowerLength != newFollowerLength){
+						loadFollowSuggestions(resp.items);
 					}
 				}
+				else if(!resp.items){
+					$('.no-follow-matched').removeClass('hide');
+				}
+				else console.log(follows);
 			});
 		}
 	}
@@ -676,12 +680,14 @@ function loadEverything(){
 			event.preventDefault();
 			var followButton = $(this).children('button');
 			if(followButton.text() === 'Follow'){
-				followButton.text("UnFollow");
+				followButton.text("Unfollow");
+				$(this).children('button').attr('disabled',true);
 				var followUsername = $(this).siblings('.follow-username').text();
 				var followee = {username:followUsername};
 				var follower = {username:loggedUser};
 				addFollowee(follower, followee);
 			}
+			getChallengeFeeds();
 		});
 	}
 
@@ -737,7 +743,7 @@ function loadEverything(){
 							</a>
 						</div>
 						<div class="panel-body">
-							<span class='question-content'>`+text+`</span>
+							<span class='question-text'>`+text+`</span>
 						</div>
 						<div class='challenge-controls hide' style='padding-left:10px;'>
 							<span class='solve' title='Solve'><span class='glyphicon glyphicon-edit'></span></span>
