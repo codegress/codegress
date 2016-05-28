@@ -391,6 +391,7 @@ function loadEverything(){
 			$('.feeds').removeClass('hide');
 		}
 		getChallengeFeeds();
+
 	});
 
 	$('#messages').click(function(){
@@ -403,6 +404,11 @@ function loadEverything(){
 		else{
 			$('.messages').removeClass('hide');	
 		}
+		gapi.client.codegress.message.readTrue({to:loggedUser}).execute(function(resp){
+			if(resp.code){
+				console.log(resp.code);
+			}
+		});
 		getMessages();
 	});
 
@@ -606,7 +612,9 @@ function loadEverything(){
 	function addChallenge(challenger, challengee){
 		if(qData.title && qData.domain && challengee && challengee !== loggedUser){
 			var question = null;
+		 
 			gapi.client.codegress.challenge.addChallenge({challenger:challenger,challengee:challengee,ques:{title:qData.title,domain:qData.domain,text:qData.text}}).execute(function(resp){
+			 
 				if(!resp.code){
 					if(resp.datetime){
 						alert("Successfully challenged "+challengee);
@@ -637,6 +645,7 @@ function loadEverything(){
 		event.preventDefault();
 		var challengee = $('#challenger-select').val();
 		addChallenge(loggedUser, challengee);
+		console.log(challengee);
 	});
 
 	$('.discover-followers').click(function(event){
@@ -812,17 +821,22 @@ function loadEverything(){
 
  	function loadMessages(messageList){
  		$('.challenges').addClass('hide');
+ 		$('.message-list').html('');
 		if(messageList){
 			for(var i=0; i<messageList.length;i++){
 				var date = new Date(messageList[i].datetime);
 				var dat = date.toLocaleString();
+				var cn=messageList.length;
 				var list=`<li class='message'>
-						<div class='message-head'><a href='#'>`+messageList[i].frm+`</a></div>
-						<div class='message-body'>`+messageList[i].message+`</div>
-						<div class='message-date'>`+ dat +`</div>
+						<ul class='list-inline'>
+						<li class='message-head'><a href='#'>`+messageList[i].frm+`&nbsp;&nbsp; `+messageList[i].message+` your challenge</a></li>
+						<li class='message-body'>`+messageList[i].ques.title+`</li>
+						<li class='message-date'>`+ dat +`</li>
+						</ul>
 					</li>`;
 			    $('.message-list').append(list);
 			}
+			 
 		}
 		 
 	}
