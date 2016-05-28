@@ -77,10 +77,12 @@ function loadCompiler(){
           if(!resp.code && resp.items){
             loadSubmission(resp.items[0]);
           }
-          showEditor();
       });
     }
     else qText = data.text;
+    displayQuestion();
+    getTestCaseData();
+    showEditor();
   });
 
   function loadSubmission(submissionData){
@@ -96,8 +98,6 @@ function loadCompiler(){
         enableCompileButton("Compile & Run");   
       }
     });
-    displayQuestion();
-    getTestCaseData();
   }
 
   /* Displays question */
@@ -426,7 +426,6 @@ function loadCompiler(){
       }).execute(function(response){
         if(!response.code){
           console.log('Submission saved');
-          console.log(response);
         }
         else console.log(response);
     });

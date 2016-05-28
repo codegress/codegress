@@ -163,7 +163,6 @@ function loadEverything(){
 					loadChallengeFeeds();
 					hideNoFeedMsg();
 				}
-				console.log(challengeFeedLength+' == '+respFeedLength);
 			}
 			else {
 				hideLoadingImage();
