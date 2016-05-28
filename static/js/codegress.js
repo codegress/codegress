@@ -242,7 +242,8 @@ function loadEverything(){
 		var question = $(selectedElement).parent().siblings('div');
 		qData.title = question.children('.question-title').text();
 		qData.text = question.children('.question-text').text();
-		qData.domain = question.children('a').children('.question-domain').text();
+		qData.domain = question.children('.question-domain').text();
+
 		$('.selected-question > .question-title').text(qData.title);
 		$('.selected-question > .question-text').text(qData.text);
 	}
@@ -387,21 +388,22 @@ function loadEverything(){
 			$('.feeds').removeClass('hide');
 		}
 		else{
-			getChallengeFeeds();
 			$('.feeds').removeClass('hide');
 		}
+		getChallengeFeeds();
 	});
 
 	$('#messages').click(function(){
 		hideMainView($('.messages'));
 		if($.trim($('.message-list').html().length)){
 			$('.messages').removeClass('hide');
+			$('.message-count').addClass('hide');
 			console.log("Messages");
 		}
 		else{
-			getMessages();
 			$('.messages').removeClass('hide');	
 		}
+		getMessages();
 	});
 
 	$('#challenges').click(function(){
@@ -410,9 +412,9 @@ function loadEverything(){
 			$('.challenges').removeClass('hide');
 		}
 		else{
-			getChallenges();
 			$('.challenges').removeClass('hide');
 		}
+		getChallenges();
 	});
 
 	$('#domains').click(function(){
@@ -502,7 +504,7 @@ function loadEverything(){
 				var listElement = `<li>
 					<div class='challenge'>
 						<ul class='list-inline'>
-							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'><b class='bold-domain'>{`+challenge.ques.domain+` }</b></span></li>
+							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'>&nbsp;|&nbsp;<b class='bold-domain'>`+challenge.ques.domain+`</b></span></li>
 							<li class="challengee-id"><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
 							<li class='pull-right'><a href='#' class='challenge-solve' title='Solve'>
 								<span class='glyphicon glyphicon-edit'></span>
@@ -551,14 +553,20 @@ function loadEverything(){
 				var likeCount=challenge.ques.likes.length;
 				if (challenge.accepted == true){
 				var listElement = `<li>
-					<div class='challenge'>	 
-						<ul class='list-inline'>
-							<li class="challenge-title-li"><a href='#' class='challenge-title'>`+challenge.ques.title+`</a> <span class='ques-domain'><b class='bold-domain'>{`+challenge.ques.domain+` }</b></span></li>
-							<li class="challengee-id"><a href='#' class='challengee'>`+challenge.challenger+`</a></li>
-							<li class='pull-right'><a href='#' class='challenge-solve' title='Solve'>
-								<span class='glyphicon glyphicon-edit'></span>
-							</a></li>
-						</ul>
+					<div class="question">
+						<div class="panel-heading feed-title">
+							<span class='question-title'>`+challenge.ques.title+`</span>&nbsp;&nbsp;
+							|<a href='#'>
+								<span class='question-domain'>`+challenge.ques.domain+`</span>
+							</a>
+							<a href='#' class='challengee'>by ... `+challenge.challenger+`</a>
+						</div>
+						<div class="panel-body">
+							<span class='question-text'>`+challenge.ques.text+`</span>
+						</div>
+						<div class='challenge-controls hide' style='padding-left:10px;'>
+							<span class='solve' title='Solve'><span class='glyphicon glyphicon-edit'></span></span>
+						</div>
 					</div>
 				</li>`;
 					$('.challenge-list').append(listElement);
@@ -566,6 +574,7 @@ function loadEverything(){
 			}
 			viewChallengContent();
 		}
+		domainQuestionEventHandlers();
 	}
 
 	function rejectedChallenges(challengeList) {
@@ -863,6 +872,12 @@ function loadEverything(){
 			currentElement.siblings('.challenge').remove();
 			currentElement.remove();
 			modifyAcceptReject(data);
+			gapi.client.codegress.message.send({to:UID,frm:loggedUser,ques:{title:title,domain:domain},message:'accepted'}).execute(function(resp){
+				if(!resp.code){
+					console.log(resp);
+				}
+			});
+
 		});
 
 		$('.reject').click(function(){
@@ -870,7 +885,12 @@ function loadEverything(){
 			var currentElement = $(this).parent('.challenge-content');
 			currentElement.siblings('.challenge').remove();
 			currentElement.remove();
-			modifyAcceptReject(data); 			
+			modifyAcceptReject(data);
+			gapi.client.codegress.message.send({to:UID,frm:loggedUser,ques:{title:title,domain:domain},message:'rejected'}).execute(function(resp){
+				if(!resp.code){
+					console.log(resp);
+				}
+			}); 			
 		});
 	}
 
