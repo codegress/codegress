@@ -1,1 +1,1 @@
-print "Start your code here.."
+print "D#CB$A"

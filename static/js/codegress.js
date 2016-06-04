@@ -83,6 +83,9 @@ function loadEverything(){
 			}
 			submissionEventHandler();
 		}
+		else{
+			$('.submission-list').html('No submissions yet ');
+		}
 	}
 
 	function submissionEventHandler(){
@@ -163,6 +166,7 @@ function loadEverything(){
 					loadChallengeFeeds();
 					hideNoFeedMsg();
 				}
+				console.log(challengeFeedLength+' == '+respFeedLength);
 			}
 			else {
 				hideLoadingImage();
@@ -533,9 +537,15 @@ function loadEverything(){
 				
 				$('.challenge-list').append(listElement);
 			}
+			else{
+				$('.challenge-list').html(" -----------NO CHALLENGES TO DISPLAY-------- ");
+			}
 			$('.challenge-panel').removeClass('hide');
 		}
 			viewChallengContent();
+		}
+		else{
+			$('.challenge-list').html(" -----------NO CHALLENGES TO DISPLAY-------- ");
 		}
 
 		$('.challenge_active').click(function(event){
@@ -576,6 +586,9 @@ function loadEverything(){
 			}
 			viewChallengContent();
 		}
+		else{
+			$('.challenge-list').html("NO CHALLENGES are ACCEPTED ");
+		}
 		domainQuestionEventHandlers();
 	}
 
@@ -596,10 +609,13 @@ function loadEverything(){
 					</div>
 				</li>`;
 				
-				$('.challenge-list').append(listElement);
+				$('.challenge-list').html(listElement);
 				}
 			}
 			viewChallengContent();
+		}
+		else{
+			$('.challenge-list').html("NO CHALLENGES are REJECTED ");
 		}
 	}
 
@@ -822,7 +838,7 @@ function loadEverything(){
 				var cn=messageList.length;
 				var list=`<li class='message'>
 						<ul class='list-inline'>
-						<li class='message-head'><a href='#'>`+messageList[i].frm+`&nbsp;&nbsp; `+messageList[i].message+` your challenge</a></li>
+						<li class='message-head'>`+messageList[i].frm+`&nbsp;`+messageList[i].message+` your challenge</li>
 						<li class='message-body'>`+messageList[i].ques.title+`</li>
 						<li class='message-date'>`+ dat +`</li>
 						</ul>
@@ -831,7 +847,9 @@ function loadEverything(){
 			}
 			 
 		}
-		 
+		 else{
+		 	$('.message-list').html('--------------------------No messages yet--------------------------');
+		 }
 	}
 
 	function viewChallengContent(){
