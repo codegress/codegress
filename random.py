@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import java.io.*;
 public class random{
 	public static void main(String[] args) throws Exception{
@@ -44,3 +45,6 @@ public class random{
 		return input;
 	}
 }
+=======
+print "D#CB$A"
+>>>>>>> b701538b921c1859dfc96890bb140cbbd1771bb5

@@ -51,20 +51,22 @@ function loadEverything(){
 		$('.password-editor').removeClass('hide');
 		$('.personal-editor').addClass('hide');
 		console.log("hello password");
-		$('.updatePassword').click(function(){
-			var oldpassword=$('.oldpassword').val();
-			var newpassword=$('.newpassword').val();
-			gapi.client.codegress.user.setPassword({username:loggedUser, oldpassword:oldpassword, newpassword:newpassword}).execute(function(resp){
-					console.log(resp);
-					if(resp.status==true)
-						alert("Password changed ");
-					else
-						alert("Stop naughty things");
-					$('.oldpassword').val("");
-					$('.newpassword').val("");
-				});
+
+	$('.updatePassword').click(function(){
+		var oldpassword=$('.oldpassword').val();
+		var newpassword=$('.newpassword').val();
+		gapi.client.codegress.user.setPassword({username:loggedUser, oldpassword:oldpassword, newpassword:newpassword}).execute(function(resp){
+				console.log(resp);
+				if(resp.status==true)
+					alert("Password changed ");
+				else
+					alert("Stop naughty things");
+				$('.oldpassword').val("");
+				$('.newpassword').val("");
 			});
 	});
+
+	
 
 	$('.profile-image > img').mouseenter(function(){
 		$('#camera').removeClass('hide');
