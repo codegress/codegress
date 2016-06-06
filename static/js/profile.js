@@ -3,7 +3,7 @@ function actualInit(apiRoot){
     var callback = function(){
         if(--apisToLoad == 0){
         	loadEverything();
-            $('body').removeClass('hide');
+            $('body').removeClass('hide'); 
         }
     };
   apisToLoad = 1;
@@ -32,20 +32,20 @@ function loadEverything(){
 	$('.personal-edit').click(function(){
 		$('.personal-editor').removeClass('hide');
 		$('.password-editor').addClass('hide');
-		$('.updateSettings').click(function(){
-			var fullname=$('.fullname').val();
-			var email=$('.email').val();
-			var country=$('.country').val();
-			gapi.client.codegress.user.setPersonalSetting({username:loggedUser, fullname:fullname, email:email, country: country}).execute(function(resp){
-				console.log(resp);
-				if(resp.status)
-					alert("Changes Done ! Sucess ");
-				else
-					alert("Stop naughty things");
-			});
+	});
+
+	$('.updateSettings').click(function(){
+		var fullname=$('.fullname').val();
+		var email=$('.email').val();
+		var country=$('.country').val();
+		gapi.client.codegress.user.setPersonalSetting({username:loggedUser, fullname:fullname, email:email, country: country}).execute(function(resp){
+			console.log(resp);
+			if(resp.status)
+				alert("Changes Done ! Sucess ");
+			else
+				alert("Stop naughty things");
 		});
 	});
-	
 
 	$('.password-edit').click(function(){
 		$('.password-editor').removeClass('hide');
@@ -63,8 +63,7 @@ function loadEverything(){
 					$('.oldpassword').val("");
 					$('.newpassword').val("");
 				});
-	});
-
+			});
 	});
 
 	$('.profile-image > img').mouseenter(function(){

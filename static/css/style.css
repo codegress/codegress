@@ -170,6 +170,9 @@ hr{
 .editor-wrapper{
 	width: 70%;
 }
+.editor-wrapper > div{
+	height: 400px;
+}
 .select-wrapper{
 	width: 20%;
 }

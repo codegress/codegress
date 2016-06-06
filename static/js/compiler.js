@@ -6,7 +6,7 @@ var editor = null;
 /* 
     Loads endpoints API and creates editor 
 */
-function actualInit(apiRoot){  
+function actualInit(apiRoot){   
   var apisToLoad;
   var callback = function(){
       if(--apisToLoad == 0){
@@ -32,7 +32,6 @@ function createEditor(){
   document.getElementById('editor'), 
   {
     mode:'none',
-    lineNumbers:true,
     autoCloseBrackets:true,
   });
   loadCompiler();
@@ -68,24 +67,25 @@ function loadCompiler(){
   /* Requesting question data from main process */
   ipcRenderer.send('qdata',{});
   
+  var submissionData = null;
   /* Saving response of the main process */
   ipcRenderer.on('qdata',function(event, data){
     qDomain = data.domain;
     qTitle = data.title;
+    qText = data.text;
     if(data.datetime){
       gapi.client.codegress.challenge.getSubmission({username:loggedUser, datetime:data.datetime}).execute(function(resp){
           if(!resp.code && resp.items){
-            loadSubmission(resp.items[0]);
+            submissionData = resp.items[0];
           }
       });
     }
-    else qText = data.text;
     displayQuestion();
     getTestCaseData();
     showEditor();
   });
 
-  function loadSubmission(submissionData){
+  function loadSubmission(){
     var lang = submissionData.language;
     qText = submissionData.ques.text;
     var langData = null;
@@ -123,23 +123,25 @@ function loadCompiler(){
   });
 
   /* Requests background data based on selected language */
-  $( "#select-lang" ).change(function() {
+  $("#select-lang" ).change(function() {
     hideAcknowledge();
     var selectedLang = getSelectedLanguage();
     var localData = getLocalData(selectedLang);
-
-    if(localData && localData.lang){
+    if(submissionData != null && submissionData.language === selectedLang){
+      loadSubmission();
+    }
+    else if(localData && localData.lang){
       languageData = JSON.parse(localData.lang);
-        editor.setOption('mode',languageData.mode);
-        editor.setOption('value',languageData.placeholder);   
-        enableCompileButton("Compile & Run");
+      editor.setOption('mode',languageData.mode);
+      editor.setOption('value',languageData.placeholder);   
+      enableCompileButton("Compile & Run");
     }
     else{
       disableCompileButton("Fetching Data...");
       gapi.client.codegress.language.getLanguage({
           'name':selectedLang
         }).execute(function(response){
-          if(!response.code){
+          if(!response.code && response.items){
             languageData = response.items[0];
             editor.setOption('mode',languageData.mode);
             editor.setOption('value',languageData.placeholder);
@@ -152,6 +154,7 @@ function loadCompiler(){
           else console.log(response);
         });
       }
+      editor.setOption('lineNumbers',true);
   });
 
   function getLocalData(selectedLang){
@@ -159,7 +162,7 @@ function loadCompiler(){
   }
 
   function getSelectedLanguage(){
-    return $( "#select-lang option:selected" ).val();
+    return $("#select-lang option:selected" ).val();
   }
 
   function enableCompileButton(text){
@@ -231,7 +234,7 @@ function loadCompiler(){
     return listElement;
   }
 
-  /* Displaying the result.. */
+  /* Displaying the result */
   var testCasePassed = 0;
   function acknowledge(data, isError){
     data = escapeHTML(data);
@@ -351,7 +354,7 @@ function loadCompiler(){
 
   /* Runs the code against test cases */
   function testCaseRunner(fileName, command){
-    numberOfPoints = 0;
+    var numberOfPoints = 0;
     if(hasCustomInput()){
       var inputPipe = getCustomPipe();
       genericRunner(fileName, command, inputPipe);
@@ -370,10 +373,10 @@ function loadCompiler(){
   /* Starting compilation process based on selected language */
   function compile(fileName){
       if(languageData.name == 'Python'){
-        pythonCompile(fileName,languageData.compile);
+        pythonCompile(fileName, languageData.compile);
       }
       else if(languageData.name == 'Java'){
-        javaCompile(fileName,languageData.compile);
+        javaCompile(fileName, languageData.compile);
       }
       else alert("Selected language is not available");
   }
@@ -405,7 +408,6 @@ function loadCompiler(){
     enableCompileButton("Compile & Run");
     $('#loading').css({'display':'none'});
     showAcknowledge();
-    scrollToBottom();
   }
 
   function showAcknowledge(){
@@ -497,10 +499,6 @@ function loadCompiler(){
     else console.log("No Testcases Found");
   }
 
-  function newTestCaseRunner(){
-
-  }
-
   /* Compilation process starts here.. */
   $('#compile-btn').click(function(){
       clearAcknowledge();
@@ -567,5 +565,4 @@ function loadCompiler(){
     callback();
     timer = setInterval(callback, 5000);
   }
-
 };
